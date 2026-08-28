@@ -6,7 +6,9 @@ format: html
 editor: visual
 ---
 
-# Create Vectors
+# Vectors
+
+## Create Vectors
 
 Create two vectors for blood pressure measurements. One vector is for pre-treatment measurements and the second vector is for post-treatment measurements.
 
@@ -16,6 +18,8 @@ pre_treat <- c(130, 128, 116, 124, 133, 134, 118, 126, 114, 127, 141, 138, 128, 
 post_treat <- c( 114, 98, 113, 99, 107, 116, 113, 111, 119, 117, 101, 119, 130, 122, 106, 106, 124, 102, 117, 113)
 ```
 
+## Name Vector Elements
+
 Add names to each of the blood pressure measurements for both the pre- treatment blood pressure measurements and the post-treatment blood pressure measureents
 
 ```{r}
@@ -24,4 +28,18 @@ pre_treat
 
 names(post_treat) <- paste("Subject", 1:20, sep = "_")
 post_treat
+```
+
+## Vector Manipulations
+
+```{r}
+change_bp <- pre_treat-post_treat
+change_bp
+str(change_bp)
+```
+
+### Mean Decrease
+
+```{r}
+mean(change_bp)
 ```
