@@ -1,0 +1,86 @@
+---
+title: "Homework2"
+author: "Emily Surrell"
+format: html
+editor: visual
+---
+
+# Task 1: Basic Vector Practice
+
+Suppose we have data from a medical experiment on blood pressure.
+
+1.  Create two vectors. One vector corresponding to the pre-treatment values for subjects 1 through 20 and one vector corresponding to the post-treatment values for subjects 1 through 20.
+
+```{r}
+
+#assign values to pre_treatment
+pre_treatment <- c(130, 128, 116, 124, 133, 134, 118, 126, 114, 127, 141, 138, 128, 140, 137, 131, 120, 128, 139, 135)
+
+#assign values to post_treatment
+post_treatment <- c(114, 98, 113, 99, 107, 116, 113, 111, 119, 117, 101, 119, 130, 122, 106, 106, 124, 102, 117, 113)
+
+#view results
+pre_treatment
+post_treatment
+```
+
+2.  Assign names to the vector elements using the paste() function.
+
+```{r}
+
+#assign names
+names(pre_treatment) <- paste("Subject", 1:20, sep = "_")
+names(post_treatment) <- paste("Subject", 1:20, sep = "_")
+
+#view results
+pre_treatment
+post_treatment
+
+```
+
+3. Calculate the change in blood pressure for each patient by subtracting post-treatment measurements from pre-treatment measurements.
+
+```{r}
+
+#calculate change in blood pressure
+blood_pressure_change <- pre_treatment - post_treatment
+
+#view results
+blood_pressure_change
+
+```
+
+4. Calculate the average decrease in blood pressure accross all patients.
+
+```{r}
+mean(blood_pressure_change)
+```
+
+5. Determine which patients experienced a decrease in blood pressure after treatment (a positive change). Use the which() function to just return the indices (and names) associated with this type of change.
+
+```{r}
+
+which(blood_pressure_change > 0)
+
+```
+
+6. Subset the vector of differences to only return those that have a positive change.
+
+```{r}
+
+#subset the vector
+blood_pressure_decreased <- blood_pressure_change[blood_pressure_change > 0]
+
+#view results
+blood_pressure_decreased
+
+```
+
+7. Calculate the average decrease in blood pressure for those where the blood pressure decreased (positive change).
+
+```{r}
+
+mean(blood_pressure_decreased)
+
+```
+
