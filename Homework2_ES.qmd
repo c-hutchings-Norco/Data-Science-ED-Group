@@ -176,3 +176,61 @@ experiment$placebo$pre_bp
 
 ```
 
+# Task 4: Control Flow Practice
+
+Continue the previous example. Suppose we want to charactize the post-treatment or post-placebo blood pressure measurement as optimal (<=120), borderline (120 < bp <= 130), and high (> 130).
+
+1. First, create a new column in each data frame called status.
+
+```{r}
+
+#create status columns
+experiment$treatment$status <- character(20)
+experiment$placebo$status <- character(10)
+
+#view results
+experiment
+
+```
+
+2. For the non-placebo data frame, create the status column's values.
+
+```{r}
+
+#fill in values for status
+for (patient in experiment$treatment$patient){
+  if (experiment$treatment$post_bp[patient] <= 120){
+    experiment$treatment$status[patient] <- "optimal"
+  } else if (experiment$treatment$post_bp[patient] <= 130){
+    experiment$treatment$status[patient] <- "borderline"
+  } else {
+    experiment$treatment$status[patient] <- "high"
+  }
+}
+
+#view results
+
+experiment$treatment
+```
+
+3. Repeat for the placebo data frame.
+
+```{r}
+
+#fill in values for status
+for (patient in experiment$placebo$patient){
+  if (experiment$placebo$post_bp[patient] <= 120){
+    experiment$placebo$status[patient] <- "optimal"
+  } else if (experiment$placebo$post_bp[patient] <= 130){
+    experiment$placebo$status[patient] <- "borderline"
+  } else {
+    experiment$placebo$status[patient] <- "high"
+  }
+}
+
+#view results
+
+experiment$placebo
+
+```
+
