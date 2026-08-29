@@ -1,0 +1,129 @@
+---
+title: "Homework 2 - Mullaney"
+format: html
+editor: visual
+---
+
+### 1. Basic Vector Practice
+
+Here, I create the named numeric vectors given in the assignment
+
+```{r}
+## Measurements
+pre <- c(130, 128, 116, 124, 133, 134, 118, 126, 114, 127, 141, 138, 128, 140, 137, 131, 120, 128, 139, 135)
+
+post <- c(114, 98, 113, 99, 107, 116, 113, 111, 119, 117, 101, 119, 130, 122, 106, 106, 124, 102, 117, 113)
+
+##Subject IDs
+names(pre) <- paste("Subject", 1:20, sep = "_")
+names(post) <- paste("Subject", 1:20, sep = "_")
+```
+
+Here, I create some new vectors based on data we have
+
+```{r}
+bp_change <- pre-post
+cat("Average blood pressure change:", mean(bp_change))
+names(which(bp_change > 0))
+bp_decrease <- which(bp_change > 0)
+cat("Average blood pressure decrease (among those who decreased):", mean(bp_decrease))
+```
+
+### 2. Basic Data Frame Practice
+
+Here I'm compiling these vectors into one data frame. `rownames(bp_df) <- NULL` resets the indices to numbers, since we have patient ID in its own column
+
+```{r}
+bp_df <- data.frame(
+  patient = names(pre),
+  pre_bp = pre,
+  post_bp = post,
+  diff_bp = bp_change)
+
+rownames(bp_df) <- NULL
+```
+
+Taking a look at `diff_bp` to see which patients' blood pressure increased:
+
+```{r}
+subset(bp_df, bp_df$diff_bp < 0)
+```
+
+Here, I am creating a new column `low_bp` to categorize `post_bp`
+
+```{r}
+bp_df$low_bp <- ifelse(bp_df$post_bp <120, TRUE, FALSE)
+```
+
+Now, let's take a look at the final table:
+
+```{r}
+knitr::kable(bp_df)
+```
+
+### 3. List Practice
+
+Combining the treatment and placebo data frames into one list
+
+```{r}
+placebo <- data.frame(
+  patient = paste("Subject", 1:10, sep = "_"),
+  pre_bp = c(138, 135, 147, 117, 152, 134, 114, 121, 131, 130),
+  post_bp = c(105, 136, 123, 130, 134, 143, 135, 139, 120, 124)
+)
+placebo$diff_bp <- placebo$pre_bp - placebo$post_bp
+placebo$low_bp = ifelse(placebo$post_bp <120, TRUE, FALSE)
+
+all <- list(treatment = bp_df, placebo = placebo)
+```
+
+Three ways to access treatment data:
+
+```{r}
+all[1]
+all[["treatment"]]
+all$treatment
+```
+
+Accessing the placebo group `pre_bp`
+
+```{r}
+all$placebo["pre_bp"]
+```
+
+### 4. Control Flow Practice
+
+Two nested for loops:
+
+`i` iterates through the two data frames, and `j` iterates through the rows of each data frame.
+
+For each row, a "status" is set based on post-treatment blood pressure.
+
+```{r}
+all$treatment["status"] <- "optimal"
+all$placebo["status"] <- "optimal"
+
+## Iterate through treatment & placebo
+
+for (i in 1:2){
+  
+  ## Iterate through rows of each
+  
+  for (j in 1:nrow(all[[i]])){
+    if ((all[[i]][["post_bp"]][j]) > 130) {
+      all[[i]][["status"]][j] = "high"
+      } else if(all[[i]][["post_bp"]][j] > 120) {
+       all[[i]][["status"]][j] = "borderline"
+       }
+  }
+}
+```
+
+Taking a look at the two tables:
+
+```{r}
+cat("Treatment\n"); knitr::kable(all["treatment"])
+cat("Placebo\n"); knitr::kable(all["placebo"])
+```
+
+All looks good! Blood pressures were properly categorized
