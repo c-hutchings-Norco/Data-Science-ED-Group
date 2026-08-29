@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Caroline Hutchings">
-<meta name="dcterms.date" content="2026-08-27">
+<meta name="dcterms.date" content="2026-08-29">
 
 <title>Homework2</title>
 <style>
@@ -140,7 +140,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">August 27, 2026</p>
+      <p class="date">August 29, 2026</p>
     </div>
   </div>
   
@@ -191,6 +191,7 @@ Subject_15 Subject_16 Subject_17 Subject_18 Subject_19 Subject_20
 </section>
 <section id="vector-manipulations" class="level2">
 <h2 class="anchored" data-anchor-id="vector-manipulations">Vector Manipulations</h2>
+<p>Determine if the bp treatment is effective by finding the difference in bp using before treatment minus after treatment.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>change_bp <span class="ot">&lt;-</span> pre_treat<span class="sc">-</span>post_treat</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>change_bp</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -208,18 +209,90 @@ Subject_15 Subject_16 Subject_17 Subject_18 Subject_19 Subject_20
  - attr(*, "names")= chr [1:20] "Subject_1" "Subject_2" "Subject_3" "Subject_4" ...</code></pre>
 </div>
 </div>
-<section id="mean-decrease" class="level3">
-<h3 class="anchored" data-anchor-id="mean-decrease">Mean Decrease</h3>
+<section id="mean-change" class="level3">
+<h3 class="anchored" data-anchor-id="mean-change">Mean Change</h3>
+<p>Determine the average change in bp after treatment.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(change_bp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 17</code></pre>
 </div>
 </div>
-
-
+</section>
+<section id="identify-elements" class="level3">
+<h3 class="anchored" data-anchor-id="identify-elements">Identify Elements</h3>
+<p>Identify each subject with a bp that decreased after treatment, or a positive change in bp since we have pre-treatment bp - post treatment bp</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>?<span class="fu">which</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>starting httpd help server ... done</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">which</span>(change_bp<span class="sc">&gt;</span><span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Subject_1  Subject_2  Subject_3  Subject_4  Subject_5  Subject_6  Subject_7 
+         1          2          3          4          5          6          7 
+ Subject_8 Subject_10 Subject_11 Subject_12 Subject_14 Subject_15 Subject_16 
+         8         10         11         12         14         15         16 
+Subject_18 Subject_19 Subject_20 
+        18         19         20 </code></pre>
+</div>
+</div>
+</section>
+<section id="subset-vector" class="level3">
+<h3 class="anchored" data-anchor-id="subset-vector">Subset Vector</h3>
+<p>Create a vector that only includes those subjects with a decrease in bp after treatment.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>positive <span class="ot">&lt;-</span> change_bp[change_bp<span class="sc">&gt;</span><span class="dv">0</span>]</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(positive)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 17</code></pre>
+</div>
+</div>
+<section id="average-decrease" class="level4">
+<h4 class="anchored" data-anchor-id="average-decrease">Average Decrease</h4>
+<p>Determine the average decrease in bp.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(positive)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 20.64706</code></pre>
+</div>
+</div>
 </section>
 </section>
+</section>
+</section>
+<section id="data-frame" class="level1">
+<h1>Data Frame</h1>
+<p>Create a data frame with patient, pre treatment bp, post treatment bp, and the differnce in bp</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>patient_info <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">names=</span><span class="fu">names</span>(pre_treat), <span class="at">pre=</span>pre_treat, <span class="at">post =</span> post_treat, <span class="at">diff=</span>change_bp, <span class="at">row.names=</span><span class="cn">NULL</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>patient_info</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        names pre post diff
+1   Subject_1 130  114   16
+2   Subject_2 128   98   30
+3   Subject_3 116  113    3
+4   Subject_4 124   99   25
+5   Subject_5 133  107   26
+6   Subject_6 134  116   18
+7   Subject_7 118  113    5
+8   Subject_8 126  111   15
+9   Subject_9 114  119   -5
+10 Subject_10 127  117   10
+11 Subject_11 141  101   40
+12 Subject_12 138  119   19
+13 Subject_13 128  130   -2
+14 Subject_14 140  122   18
+15 Subject_15 137  106   31
+16 Subject_16 131  106   25
+17 Subject_17 120  124   -4
+18 Subject_18 128  102   26
+19 Subject_19 139  117   22
+20 Subject_20 135  113   22</code></pre>
+</div>
+</div>
+
+
 </section>
 
 </main> <!-- /main -->

@@ -32,14 +32,55 @@ post_treat
 
 ## Vector Manipulations
 
+Determine if the bp treatment is effective by finding the difference in bp using before treatment minus after treatment.
+
 ```{r}
 change_bp <- pre_treat-post_treat
 change_bp
 str(change_bp)
 ```
 
-### Mean Decrease
+### Mean Change
+
+Determine the average change in bp after treatment.
 
 ```{r}
 mean(change_bp)
+```
+
+### Identify Elements
+
+Identify each subject with a bp that decreased after treatment, or a positive change in bp since we have pre-treatment bp - post treatment bp
+
+```{r}
+?which()
+which(change_bp>0)
+```
+
+### Subset Vector
+
+Create a vector that only includes those subjects with a decrease in bp after treatment.
+
+```{r}
+positive <- change_bp[change_bp>0]
+length(positive)
+
+
+```
+
+#### Average Decrease
+
+Determine the average decrease in bp.
+
+```{r}
+mean(positive)
+```
+
+# Data Frame
+
+Create a data frame with patient, pre treatment bp, post treatment bp, and the differnce in bp
+
+```{r}
+patient_info <- data.frame(names=names(pre_treat), pre=pre_treat, post = post_treat, diff=change_bp, row.names=NULL)
+patient_info
 ```
