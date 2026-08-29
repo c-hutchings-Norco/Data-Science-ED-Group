@@ -1,5 +1,5 @@
 ---
-title: "Homework2"
+title: "Homework 2"
 author: "Emily Surrell"
 format: html
 editor: visual
@@ -38,7 +38,7 @@ post_treatment
 
 ```
 
-3. Calculate the change in blood pressure for each patient by subtracting post-treatment measurements from pre-treatment measurements.
+3.  Calculate the change in blood pressure for each patient by subtracting post-treatment measurements from pre-treatment measurements.
 
 ```{r}
 
@@ -50,13 +50,13 @@ blood_pressure_change
 
 ```
 
-4. Calculate the average decrease in blood pressure accross all patients.
+4.  Calculate the average decrease in blood pressure accross all patients.
 
 ```{r}
 mean(blood_pressure_change)
 ```
 
-5. Determine which patients experienced a decrease in blood pressure after treatment (a positive change). Use the which() function to just return the indices (and names) associated with this type of change.
+5.  Determine which patients experienced a decrease in blood pressure after treatment (a positive change). Use the which() function to just return the indices (and names) associated with this type of change.
 
 ```{r}
 
@@ -64,7 +64,7 @@ which(blood_pressure_change > 0)
 
 ```
 
-6. Subset the vector of differences to only return those that have a positive change.
+6.  Subset the vector of differences to only return those that have a positive change.
 
 ```{r}
 
@@ -76,7 +76,7 @@ blood_pressure_decreased
 
 ```
 
-7. Calculate the average decrease in blood pressure for those where the blood pressure decreased (positive change).
+7.  Calculate the average decrease in blood pressure for those where the blood pressure decreased (positive change).
 
 ```{r}
 
@@ -84,3 +84,42 @@ mean(blood_pressure_decreased)
 
 ```
 
+# Task 2: Basic Data Frame Practice
+
+Continue the previous example.
+
+1.  Create a data frame object with four columns corresponding to your data above: patient, pre_bp, post_bp, and diff_bp.
+
+```{r}
+
+#create data frame
+blood_pressure <- data.frame(patient = 1:20, pre_bp = pre_treatment, post_bp = post_treatment, diff_bp = blood_pressure_change)
+
+#view results
+blood_pressure
+
+```
+
+2.  Return only rows where the diff_bp column is negative.
+
+```{r}
+
+blood_pressure[blood_pressure$diff_bp < 0,]
+
+```
+
+3.  Add a new column to the data frame corresponding to TRUE if the post_bp is less than 120.
+
+```{r}
+
+blood_pressure$lessthan120 <- (blood_pressure$post_bp < 120)
+
+```
+
+4.  Finally, print the data frame out nicely.
+
+```{r}
+
+knitr::kable(blood_pressure)
+
+```
