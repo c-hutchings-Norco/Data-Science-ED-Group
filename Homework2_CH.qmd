@@ -81,6 +81,31 @@ mean(positive)
 Create a data frame with patient, pre treatment bp, post treatment bp, and the differnce in bp
 
 ```{r}
-patient_info <- data.frame(names=names(pre_treat), pre=pre_treat, post = post_treat, diff=change_bp, row.names=NULL)
+patient_info <- data.frame(patient=names(pre_treat), pre_bp=pre_treat, post_bp = post_treat, diff_bp=change_bp, row.names=NULL)
 patient_info
+```
+
+### Subset the Data Frame
+
+Select rows from the data frame where the difference in bp is negative. In other words select the rows where the pre-treatment bp is lower than the post-treatment bp.
+
+```{r}
+neg_bp <- patient_info[patient_info$diff_bp<0,]
+neg_bp
+```
+
+### Adding a New Column
+
+Add a column that compares the post-treatment bp to 120 and returns true when the bp is less than 120.
+
+```{r}
+patient_info$true <- patient_info$post_bp<120
+patient_info
+
+```
+
+### Print the Data Frame
+
+```{r}
+knitr::kable(patient_info)
 ```
