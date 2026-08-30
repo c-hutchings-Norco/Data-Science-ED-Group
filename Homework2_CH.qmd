@@ -109,3 +109,45 @@ patient_info
 ```{r}
 knitr::kable(patient_info)
 ```
+
+## New Data Frame
+
+Create a new data frame with only 10 subjects that contains all of the same variables as the original data frame.
+
+```{r}
+pre_placebo <- c(138, 135, 147, 117, 152, 134, 114, 121, 131, 130)
+post_placebo <- c(105, 136, 123, 130, 134, 143, 135, 139, 120, 124)
+patient_placebo <- data.frame(patient_names=paste("Subject", 1:10, sep = "_"), pre_bp_placebo=pre_placebo, post_bp_placebo=post_placebo, diff_placebo_bp=pre_placebo-post_placebo, true= post_placebo <120)
+patient_placebo
+```
+
+## List
+
+Create a list that contains both of the data frames, the treatment and placebo data frames.
+
+```{r}
+patient_list <- list(treatment = patient_info, placebo = patient_placebo)
+patient_list
+```
+
+Access the first element of the list.
+
+```{r}
+patient_list[1]
+patient_list[[1]]
+names(patient_list)
+patient_list$treatment
+```
+
+Access the placebo data frame from the list and pre_bp column.
+
+```{r}
+patient_list[[2]][,2]
+```
+
+## Control Flow
+
+```{r}
+patient_info$status <- character(20)
+patient_placebo$status <- character(10)
+```
