@@ -654,9 +654,158 @@ $placebo
 </section>
 <section id="control-flow" class="level2">
 <h2 class="anchored" data-anchor-id="control-flow">Control Flow</h2>
+<p>Create a new column in each data frame called status and identify the status rating for each post treatment bp and store in the data frame in the list.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>patient_info<span class="sc">$</span>status <span class="ot">&lt;-</span> <span class="fu">character</span>(<span class="dv">20</span>)</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>patient_placebo<span class="sc">$</span>status <span class="ot">&lt;-</span> <span class="fu">character</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>patient_list <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">treatment=</span>patient_info, <span class="at">placebo=</span>patient_placebo)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>patient_list</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$treatment
+      patient pre_bp post_bp diff_bp  true
+1   Subject_1    130     114      16  TRUE
+2   Subject_2    128      98      30  TRUE
+3   Subject_3    116     113       3  TRUE
+4   Subject_4    124      99      25  TRUE
+5   Subject_5    133     107      26  TRUE
+6   Subject_6    134     116      18  TRUE
+7   Subject_7    118     113       5  TRUE
+8   Subject_8    126     111      15  TRUE
+9   Subject_9    114     119      -5  TRUE
+10 Subject_10    127     117      10  TRUE
+11 Subject_11    141     101      40  TRUE
+12 Subject_12    138     119      19  TRUE
+13 Subject_13    128     130      -2 FALSE
+14 Subject_14    140     122      18 FALSE
+15 Subject_15    137     106      31  TRUE
+16 Subject_16    131     106      25  TRUE
+17 Subject_17    120     124      -4 FALSE
+18 Subject_18    128     102      26  TRUE
+19 Subject_19    139     117      22  TRUE
+20 Subject_20    135     113      22  TRUE
+
+$placebo
+   patient_names pre_bp_placebo post_bp_placebo diff_placebo_bp  true
+1      Subject_1            138             105              33  TRUE
+2      Subject_2            135             136              -1 FALSE
+3      Subject_3            147             123              24 FALSE
+4      Subject_4            117             130             -13 FALSE
+5      Subject_5            152             134              18 FALSE
+6      Subject_6            134             143              -9 FALSE
+7      Subject_7            114             135             -21 FALSE
+8      Subject_8            121             139             -18 FALSE
+9      Subject_9            131             120              11 FALSE
+10    Subject_10            130             124               6 FALSE</code></pre>
+</div>
+</div>
+<p>Fill the status column with values.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create the status column for treatment data frame</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>patient_list[[<span class="dv">1</span>]]<span class="sc">$</span>status <span class="ot">&lt;-</span> <span class="fu">character</span>(<span class="dv">20</span>)</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="co">#fill the status column with post treatment bp rating</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>) {</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (patient_list[[<span class="dv">1</span>]][i, <span class="dv">3</span>] <span class="sc">&lt;=</span> <span class="dv">120</span>) {</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    patient_list[[<span class="dv">1</span>]][i,<span class="dv">6</span>] <span class="ot">&lt;-</span> <span class="st">"Optimal"</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>  } </span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> <span class="cf">if</span> (patient_list[[<span class="dv">1</span>]][i, <span class="dv">3</span>] <span class="sc">&lt;=</span> <span class="dv">130</span>) {patient_list[[<span class="dv">1</span>]][i,<span class="dv">6</span>] <span class="ot">&lt;-</span> <span class="st">"Borderline"</span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>  } </span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> {</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>    patient_list[[<span class="dv">1</span>]][i,<span class="dv">6</span>] <span class="ot">&lt;-</span> <span class="st">"High"</span></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a><span class="co">#create status column for placebo data frame</span></span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>patient_list[[<span class="dv">2</span>]]<span class="sc">$</span>status <span class="ot">&lt;-</span> <span class="fu">character</span>(<span class="dv">10</span>)</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a><span class="co">#fill the status column with post treatment bp rating</span></span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) {</span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (patient_list[[<span class="dv">2</span>]][i, <span class="dv">3</span>] <span class="sc">&lt;=</span> <span class="dv">120</span>) {</span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>    patient_list[[<span class="dv">2</span>]][i,<span class="dv">6</span>] <span class="ot">&lt;-</span> <span class="st">"Optimal"</span></span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>  } </span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> <span class="cf">if</span> (patient_list[[<span class="dv">2</span>]][i, <span class="dv">3</span>] <span class="sc">&lt;=</span> <span class="dv">130</span>) {patient_list[[<span class="dv">2</span>]][i,<span class="dv">6</span>] <span class="ot">&lt;-</span> <span class="st">"Borderline"</span></span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>  } </span>
+<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> {</span>
+<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a>    patient_list[[<span class="dv">2</span>]][i,<span class="dv">6</span>] <span class="ot">&lt;-</span> <span class="st">"High"</span></span>
+<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a>patient_list</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$treatment
+      patient pre_bp post_bp diff_bp  true     status
+1   Subject_1    130     114      16  TRUE    Optimal
+2   Subject_2    128      98      30  TRUE    Optimal
+3   Subject_3    116     113       3  TRUE    Optimal
+4   Subject_4    124      99      25  TRUE    Optimal
+5   Subject_5    133     107      26  TRUE    Optimal
+6   Subject_6    134     116      18  TRUE    Optimal
+7   Subject_7    118     113       5  TRUE    Optimal
+8   Subject_8    126     111      15  TRUE    Optimal
+9   Subject_9    114     119      -5  TRUE    Optimal
+10 Subject_10    127     117      10  TRUE    Optimal
+11 Subject_11    141     101      40  TRUE    Optimal
+12 Subject_12    138     119      19  TRUE    Optimal
+13 Subject_13    128     130      -2 FALSE Borderline
+14 Subject_14    140     122      18 FALSE Borderline
+15 Subject_15    137     106      31  TRUE    Optimal
+16 Subject_16    131     106      25  TRUE    Optimal
+17 Subject_17    120     124      -4 FALSE Borderline
+18 Subject_18    128     102      26  TRUE    Optimal
+19 Subject_19    139     117      22  TRUE    Optimal
+20 Subject_20    135     113      22  TRUE    Optimal
+
+$placebo
+   patient_names pre_bp_placebo post_bp_placebo diff_placebo_bp  true
+1      Subject_1            138             105              33  TRUE
+2      Subject_2            135             136              -1 FALSE
+3      Subject_3            147             123              24 FALSE
+4      Subject_4            117             130             -13 FALSE
+5      Subject_5            152             134              18 FALSE
+6      Subject_6            134             143              -9 FALSE
+7      Subject_7            114             135             -21 FALSE
+8      Subject_8            121             139             -18 FALSE
+9      Subject_9            131             120              11 FALSE
+10    Subject_10            130             124               6 FALSE
+       status
+1     Optimal
+2        High
+3  Borderline
+4  Borderline
+5        High
+6        High
+7        High
+8        High
+9     Optimal
+10 Borderline</code></pre>
+</div>
+</div>
+<p>try this</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create the status column for treatment data frame</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>patient_info<span class="sc">$</span>status <span class="ot">&lt;-</span> <span class="fu">character</span>(<span class="dv">20</span>)</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="co">#fill the status column with post treatment bp rating</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>) {</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (patient_list[[<span class="dv">1</span>]][i, <span class="dv">3</span>] <span class="sc">&lt;=</span> <span class="dv">120</span>) {</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    patient_info<span class="sc">$</span>status[i] <span class="ot">&lt;-</span> <span class="st">"Optimal"</span></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>  } </span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> <span class="cf">if</span> (patient_list[[<span class="dv">1</span>]][i, <span class="dv">3</span>] <span class="sc">&lt;=</span> <span class="dv">130</span>) {patient_info<span class="sc">$</span>status[i] <span class="ot">&lt;-</span> <span class="st">"Borderline"</span></span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>  } </span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> {</span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>    patient_info<span class="sc">$</span>status[i] <span class="ot">&lt;-</span> <span class="st">"High"</span></span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>patient_list[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> patient_info</span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a><span class="co">#create the status column for the placebo data frame</span></span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>patient_placebo<span class="sc">$</span>status <span class="ot">&lt;-</span> <span class="fu">character</span>(<span class="dv">10</span>)</span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>){</span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (patient_list[[<span class="dv">2</span>]][i,<span class="dv">3</span>] <span class="sc">&lt;=</span> <span class="dv">120</span>) {</span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>    patient_placebo<span class="sc">$</span>status[i] <span class="ot">&lt;-</span> <span class="st">"Optimal"</span></span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> <span class="cf">if</span> (patient_list[[<span class="dv">2</span>]][i,<span class="dv">3</span>]<span class="sc">&lt;=</span><span class="dv">130</span>) {patient_placebo<span class="sc">$</span>status[i] <span class="ot">&lt;-</span> <span class="st">"Borderline"</span></span>
+<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> {</span>
+<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a>    patient_placebo<span class="sc">$</span>status[i] <span class="ot">&lt;-</span> <span class="st">"High"</span></span>
+<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb45-28"><a href="#cb45-28" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

@@ -147,7 +147,44 @@ patient_list[[2]][,2]
 
 ## Control Flow
 
+Create a new column in each data frame called status and identify the status rating for each post treatment bp and store in the data frame in the list.
+
 ```{r}
-patient_info$status <- character(20)
-patient_placebo$status <- character(10)
+patient_list <- list(treatment=patient_info, placebo=patient_placebo)
+patient_list
+```
+
+Fill the status column with ratings from the post treatment bp.
+
+```{r}
+#create the status column for treatment data frame
+patient_list[[1]]$status <- character(20)
+#fill the status column with post treatment bp rating
+for (i in 1:20) {
+  if (patient_list[[1]][i, 3] <= 120) {
+    patient_list[[1]][i,6] <- "Optimal"
+  } 
+  else if (patient_list[[1]][i, 3] <= 130) {patient_list[[1]][i,6] <- "Borderline"
+  } 
+  else {
+    patient_list[[1]][i,6] <- "High"
+  }
+}
+
+#create status column for placebo data frame
+patient_list[[2]]$status <- character(10)
+#fill the status column with post treatment bp rating
+for (i in 1:10) {
+  if (patient_list[[2]][i, 3] <= 120) {
+    patient_list[[2]][i,6] <- "Optimal"
+  } 
+  else if (patient_list[[2]][i, 3] <= 130) {patient_list[[2]][i,6] <- "Borderline"
+  } 
+  else {
+    patient_list[[2]][i,6] <- "High"
+  }
+}
+
+patient_list
+
 ```
