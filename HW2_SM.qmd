@@ -71,4 +71,38 @@ knitr::kable(bp_all)
 ```
 
 ## Task 3: List Practice 
+Creation of new data frame to include placebos
+```{r}
+# Create Vectors of new placebo values
+placebo_pre_bp <- c(138, 135, 147, 117, 152, 134, 114, 121, 131, 130)
+placebo_post_bp <- c(105, 136, 123, 130, 134, 143, 135, 139, 120, 124)
+placebo_diff_bp <- (placebo_pre_bp - placebo_post_bp)
+placebo_patient <- paste("Subject", 1:10, sep = "_")
+
+# Create Data frame similar to one completed in task 2
+placebo_bp_df <- data.frame(placebo_patient, placebo_pre_bp, placebo_post_bp, placebo_diff_bp)
+placebo_bp_low <- (placebo_bp_df$placebo_post_bp < 120)
+placebo_bp_all <- data.frame(placebo_bp_df, placebo_bp_low)
+placebo_bp_all
+```
+
+Create list elements corresponding to treatment groups
+```{r}
+experiment_groups <- list (treatment = bp_all, placebo = placebo_bp_all)
+experiment_groups
+```
+
+Accessing first list element with different syntax types
+```{r}
+experiment_groups[1]
+experiment_groups[[1]]
+experiment_groups$treatment
+```
+
+
+Access pre_bp column from placebo data frame
+```{r}
+experiment_groups$placebo$placebo_pre_bp
+```
+
 ## Task 4: Control Flow Practice
