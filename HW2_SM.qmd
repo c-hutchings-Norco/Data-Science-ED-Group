@@ -37,6 +37,8 @@ which(diff_bp > 0)
 Subset patients with blood pressure drop into a vector
 ```{r}
 bp_drop <- diff_bp[diff_bp > 0]
+
+#Confirm subsetting worked by printing vector
 bp_drop
 ```
 
@@ -49,12 +51,16 @@ mean(bp_drop)
 Create initial data frame
 ```{r}
 bp_df <- data.frame(patient, pre_bp, post_bp, diff_bp)
+
+#Confirm dedired data frame created
 bp_df
 ```
 
 Data frame with blood pressure increases post-treatment
 ```{r}
 bp_inc <- bp_df[bp_df$diff_bp < 0, ]
+
+#Confirm desired data frame created
 bp_inc
 ```
 
@@ -62,6 +68,8 @@ Data frame including a column identifying which patients have post_bp < 120
 ```{r}
 bp_low <- (bp_df$post_bp < 120)
 bp_all <- data.frame(bp_df,bp_low)
+
+#Confirm desired data frame created
 bp_all
 ```
 
@@ -83,12 +91,16 @@ placebo_patient <- paste("Subject", 1:10, sep = "_")
 placebo_bp_df <- data.frame(placebo_patient, placebo_pre_bp, placebo_post_bp, placebo_diff_bp)
 placebo_bp_low <- (placebo_bp_df$placebo_post_bp < 120)
 placebo_bp_all <- data.frame(placebo_bp_df, placebo_bp_low)
+
+#Confirm desired data frame created
 placebo_bp_all
 ```
 
 Create list elements corresponding to treatment groups
 ```{r}
 experiment_groups <- list (treatment = bp_all, placebo = placebo_bp_all)
+
+#Confirm desired list created
 experiment_groups
 ```
 
@@ -106,3 +118,45 @@ experiment_groups$placebo$placebo_pre_bp
 ```
 
 ## Task 4: Control Flow Practice
+Create new column in both data frames
+```{r}
+experiment_groups$treatment$status <- character(20)
+experiment_groups$placebo$status <- character(10)
+
+#confirm desired columns added to data frames
+experiment_groups
+```
+
+Create status value for treatment group
+```{r}
+for (i in 1:20){
+  if (experiment_groups$treatment[i,3] <= 120){
+    experiment_groups$treatment[i,6] <- 'optimal'
+  } else if (experiment_groups$treatment[i,3] <= 130){
+    experiment_groups$treatment[i,6] <- 'borderline'
+  } else if (experiment_groups$treatment[i,3] > 130){
+      experiment_groups$treatment[i,6] <- 'high'
+    }
+}
+
+#Confirm conditional logic worked
+experiment_groups$treatment
+```
+
+
+Create status value for placebo group
+```{r}
+for (i in 1:10){
+  if (experiment_groups$placebo[i,3] <= 120){
+    experiment_groups$placebo[i,6] <- 'optimal'
+  } else if (experiment_groups$placebo[i,3] <= 130){
+    experiment_groups$placebo[i,6] <- 'borderline'
+  } else if (experiment_groups$placebo[i,3] > 130){
+      experiment_groups$placebo[i,6] <- 'high'
+    }
+}
+
+#Confirm conditional logic worked
+experiment_groups$placebo
+```
+
