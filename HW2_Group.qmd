@@ -170,13 +170,13 @@ patient_list[[1]]$status <- character(20)
 #create status column for placebo data frame
 patient_list[[2]]$status <- character(10)
 
-patient_list
+patient_list$treatment
 ```
 
 2.  Fill the treatment group's status column with ratings from subjects' post treatment blood pressure.
 
 ```{r}
-for (i in 1:20) {
+for (i in 1:nrow(patient_list$treatment)) {
   if (patient_list[[1]][i, "post_bp"] <= 120) {
     patient_list[[1]][i,"status"] <- "Optimal"
   } 
@@ -192,7 +192,7 @@ for (i in 1:20) {
 3.  Repeat for placebo group.
 
 ```{r}
-for (i in 1:10) {
+for (i in 1:nrow(patient_list$placebo)) {
   if (patient_list[[2]][i, "post_bp"] <= 120) {
     patient_list[[2]][i,"status"] <- "Optimal"
   } 

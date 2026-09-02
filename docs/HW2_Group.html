@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="ST 558 Group 5">
-<meta name="dcterms.date" content="2026-09-01">
+<meta name="dcterms.date" content="2026-09-02">
 
 <title>Homework 2</title>
 <style>
@@ -140,7 +140,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 1, 2026</p>
+      <p class="date">September 2, 2026</p>
     </div>
   </div>
   
@@ -701,10 +701,9 @@ $placebo
 <span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="co">#create status column for placebo data frame</span></span>
 <span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>patient_list[[<span class="dv">2</span>]]<span class="sc">$</span>status <span class="ot">&lt;-</span> <span class="fu">character</span>(<span class="dv">10</span>)</span>
 <span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>patient_list</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>patient_list<span class="sc">$</span>treatment</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>$treatment
-      patient pre_bp post_bp diff_bp  true status
+<pre><code>      patient pre_bp post_bp diff_bp  true status
 1   Subject_1    130     114      16  TRUE       
 2   Subject_2    128      98      30  TRUE       
 3   Subject_3    116     113       3  TRUE       
@@ -724,27 +723,14 @@ $placebo
 17 Subject_17    120     124      -4 FALSE       
 18 Subject_18    128     102      26  TRUE       
 19 Subject_19    139     117      22  TRUE       
-20 Subject_20    135     113      22  TRUE       
-
-$placebo
-   patient_names pre_bp post_bp diff_bp  true status
-1      Subject_1    138     105      33  TRUE       
-2      Subject_2    135     136      -1 FALSE       
-3      Subject_3    147     123      24 FALSE       
-4      Subject_4    117     130     -13 FALSE       
-5      Subject_5    152     134      18 FALSE       
-6      Subject_6    134     143      -9 FALSE       
-7      Subject_7    114     135     -21 FALSE       
-8      Subject_8    121     139     -18 FALSE       
-9      Subject_9    131     120      11 FALSE       
-10    Subject_10    130     124       6 FALSE       </code></pre>
+20 Subject_20    135     113      22  TRUE       </code></pre>
 </div>
 </div>
 <ol start="2" type="1">
 <li>Fill the treatment group’s status column with ratings from subjects’ post treatment blood pressure.</li>
 </ol>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>) {</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(patient_list<span class="sc">$</span>treatment)) {</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (patient_list[[<span class="dv">1</span>]][i, <span class="st">"post_bp"</span>] <span class="sc">&lt;=</span> <span class="dv">120</span>) {</span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    patient_list[[<span class="dv">1</span>]][i,<span class="st">"status"</span>] <span class="ot">&lt;-</span> <span class="st">"Optimal"</span></span>
 <span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  } </span>
@@ -760,7 +746,7 @@ $placebo
 <li>Repeat for placebo group.</li>
 </ol>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) {</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(patient_list<span class="sc">$</span>placebo)) {</span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (patient_list[[<span class="dv">2</span>]][i, <span class="st">"post_bp"</span>] <span class="sc">&lt;=</span> <span class="dv">120</span>) {</span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    patient_list[[<span class="dv">2</span>]][i,<span class="st">"status"</span>] <span class="ot">&lt;-</span> <span class="st">"Optimal"</span></span>
 <span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  } </span>
