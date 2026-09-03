@@ -9,7 +9,7 @@
 <meta name="author" content="Cameron Mullaney">
 <meta name="dcterms.date" content="2026-09-03">
 
-<title>HW3_CM</title>
+<title>Homework 3</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -123,7 +123,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">HW3_CM</h1>
+<h1 class="title">Homework 3</h1>
 </div>
 
 
@@ -307,13 +307,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Testing out the function</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Variable </span><span class="sc">\t</span><span class="st"> IQR"</span>,</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"</span><span class="sc">\n\n</span><span class="st">Fixed Acidity:</span><span class="sc">\t</span><span class="st">"</span>, <span class="fu">getIQR</span>(wine<span class="sc">$</span>fixed_acidity), </span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"</span><span class="sc">\n\n</span><span class="st">Citric Acid:</span><span class="sc">\t</span><span class="st">"</span>, <span class="fu">getIQR</span>(wine<span class="sc">$</span>citric_acid))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"</span><span class="sc">\n</span><span class="st">Fixed Acidity:</span><span class="sc">\t</span><span class="st">"</span>, <span class="fu">getIQR</span>(wine<span class="sc">$</span>fixed_acidity), </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"</span><span class="sc">\n</span><span class="st">Citric Acid:</span><span class="sc">\t</span><span class="st">"</span>, <span class="fu">getIQR</span>(wine<span class="sc">$</span>citric_acid))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Variable     IQR 
-
 Fixed Acidity:   1.3 
-
 Citric Acid:     0.14</code></pre>
 </div>
 </div>
@@ -389,30 +387,30 @@ Citric Acid:     0.4560663</code></pre>
 <span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>test2</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>=== Test 1: ===
-          unif         norm     gamma      beta
-1  0.071343161  0.006319735 4.6822440 0.9710981
-2  0.057733120  0.732633060 1.1919125 0.8659990
-3  0.424040091  1.151177994 1.2212469 0.8620045
-4  0.859455431 -0.046797630 0.3821971 0.9323344
-5  0.735350300  1.764451257 0.1047695 0.9504297
-6  0.899828416  0.340238376 2.4359216 0.8758761
-7  0.553304116 -0.558486140 1.5074951 0.5520866
-8  0.459217428 -0.974077658 0.9331598 0.7468960
-9  0.007887367 -0.496269595 0.1379300 0.9506000
-10 0.001515706 -0.782224928 0.3006075 0.9690076
+         unif       norm     gamma      beta
+1  0.67311032 -0.5712720 0.1283073 0.9710637
+2  0.32791938 -0.7817196 2.0340419 0.7333277
+3  0.72482483  0.5047791 0.8521669 0.8690075
+4  0.53568184 -1.2956685 1.1464159 0.7042884
+5  0.66883398  0.3011978 0.5489925 0.7717622
+6  0.41486820  0.2936393 0.3490994 0.7817177
+7  0.30195707 -0.6873299 0.3820168 0.9667431
+8  0.04196506  0.3174080 0.1299486 0.9235441
+9  0.11137600 -0.3270646 0.2839532 0.9425789
+10 0.51430334 -0.8575435 0.7098509 0.7859607
 
 === Test 2 ===
-          unif         norm     gamma      beta         b
-1  0.071343161  0.006319735 4.6822440 0.9710981  9.077628
-2  0.057733120  0.732633060 1.1919125 0.8659990  8.282440
-3  0.424040091  1.151177994 1.2212469 0.8620045 10.234414
-4  0.859455431 -0.046797630 0.3821971 0.9323344  9.754421
-5  0.735350300  1.764451257 0.1047695 0.9504297 10.537458
-6  0.899828416  0.340238376 2.4359216 0.8758761  7.874468
-7  0.553304116 -0.558486140 1.5074951 0.5520866  9.611463
-8  0.459217428 -0.974077658 0.9331598 0.7468960  8.637515
-9  0.007887367 -0.496269595 0.1379300 0.9506000  8.994741
-10 0.001515706 -0.782224928 0.3006075 0.9690076  9.269508</code></pre>
+         unif       norm     gamma      beta         b
+1  0.67311032 -0.5712720 0.1283073 0.9710637  8.853207
+2  0.32791938 -0.7817196 2.0340419 0.7333277  8.890878
+3  0.72482483  0.5047791 0.8521669 0.8690075  8.574505
+4  0.53568184 -1.2956685 1.1464159 0.7042884 10.859436
+5  0.66883398  0.3011978 0.5489925 0.7717622  8.451180
+6  0.41486820  0.2936393 0.3490994 0.7817177 10.329275
+7  0.30195707 -0.6873299 0.3820168 0.9667431  9.388730
+8  0.04196506  0.3174080 0.1299486 0.9235441 10.258590
+9  0.11137600 -0.3270646 0.2839532 0.9425789  8.867638
+10 0.51430334 -0.8575435 0.7098509 0.7859607 10.155530</code></pre>
 </div>
 </div>
 
