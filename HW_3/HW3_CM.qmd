@@ -3,44 +3,189 @@ title: "HW3_CM"
 author: Cameron Mullaney
 date: today
 format: html
-editor: visual
 ---
 
 ### Task 1: Conceptual Questions
 
 1.  To do this, you need to add "../", so you would need `read_csv("../MyData.csv")`. `../` will take you one step "back" in your working directory, and then you can navigate from there.
+
 2.  R projects function as a storage space for all information associated with a given... project. They have a separate workspace, working directory, and source documents, making it simpler and easier to keep all relevant files in one place.
+
 3.  Git is a version control software that allows multiple people to remotely work on the same project simultaneously. GitHub is the online interface for this software, and it doubles as a public distribution system for those projects.
+
 4.  Tibbles and data frames are very similar, but the main differences are that
+
     1.  Tibbles do less guessing when used (i.e. no partial matching), so errors come up earlier
     2.  When printing, tibbles limit the number of rows printed to 10
 
 ### Task 2: Reading Delimited Data
 
+First, load in the **tidyverse** package from the library.
+
+Then the `glass` data can be loaded in directly from its URL using `read_csv()` from the `readr` package
+
 ```{r}
+#| warning: false
+#| results: hold
+
 library(tidyverse)
 ## The glass data has no headers
-glassColNames <- c('id', 'ri', 'na', 'mg', 'al', 'si', 'k', 'ca', 'ba', 'fe',
-                   'type')
+glassColNames <- c('id', 'ri', 'na', 'mg', 'al', 'si', 'k', 'ca', 'ba', 'fe', 'type')
 glass <- read_csv("https://www4.stat.ncsu.edu/~online/datasets/glass.data", 
                   col_names = glassColNames)
-
 glass
 ```
 
+Next, load in the `yeast` data. The data is separated by uneven numbers of spaces, so `read_table()` is used.
+
 ```{r}
+#| results: hold
+
 yeastColNames<-c('seq', 'mcg', 'gvh', 'alm', 'mit', 'erl', 'pox', 'vac', 'nuc', 'class')
 
-yeast <- read_delim("https://www4.stat.ncsu.edu/online/datasets/yeast.data", 
-                    delim = "  ", col_names = yeastColNames)
+yeast <- read_table("https://www4.stat.ncsu.edu/online/datasets/yeast.data",
+                    col_names = yeastColNames, show_col_types = FALSE)
 yeast
 ```
+
 ### Task 3: Combining Excel and Delimited Data
+
+White wine first - loading data from excel file in repo
+
 ```{r}
+#| warning: false
 ## Need the readxl package!
 library(readxl)
-
-white <- read_excel("HW_3/white-wine.xlsx", sheet = 1)
-
+white <- read_excel("white-wine.xlsx", sheet = 1)
+white
 ```
 
+A couple data cleaning tasks:
+
+```{r}
+## Pull in better column names from second sheet of .xlsx file
+newNames <- read_excel("white-wine.xlsx", sheet = 2)
+
+## Transpose them, and then overwrite old column names
+colnames(white) <- t(newNames)
+
+## Additional column to specify wine color
+white$color <- "white"
+```
+
+On to red wine!
+
+```{r}
+## Read in file from link - *semicolon* separated values
+red <- read_delim("https://www4.stat.ncsu.edu/~online/datasets/red-wine.csv", 
+                delim = ";", show_col_types = FALSE)
+
+## Replace names using the same name list
+colnames(red) <- t(newNames)
+
+## Additional column to specify wine color
+red$color <- "red"
+```
+
+Now, to put it all together! Combining both wine tibbles into one
+
+```{r}
+wine <- dplyr::bind_rows(white, red)
+wine
+```
+
+### Task 4: Writing a Function
+
+Creating `getIQR`, which returns the interquartile range of a provided numeric vector.
+
+```{r}
+getIQR <- function(x){
+  q <- quantile(x, probs = c(.25, .75))
+  iqr <- unname(q[2] - q[1])
+  return(iqr)
+}
+```
+
+Testing out the function
+
+```{r}
+cat("Variable \t IQR",
+    "\nFixed Acidity:\t", getIQR(wine$fixed_acidity), 
+    "\nCitric Acid:\t", getIQR(wine$citric_acid))
+```
+
+Seems like it works!
+
+Now, creating a second function, `getCoefVar`, which returns the *sample coefficient of variation*
+
+( sample standard deviation / \| sample mean \| )
+
+```{r}
+getCoefVar <- function(x){
+  return(sd(x)/abs(mean(x)))
+}
+```
+
+Testing out the function on the same columns as above
+
+```{r}
+cat("Variable \t Coefficient of Variance",
+    "\n====================================",
+    "\nFixed Acidity:\t", getCoefVar(wine$fixed_acidity), 
+    "\nCitric Acid:\t", getCoefVar(wine$citric_acid))
+```
+
+Seems like it works!
+
+Now, creating a third function, which utilizes the first two - `getSummaries()` returns a list containing the results of `getIQR()` and `getCoefVar()`
+
+```{r}
+getSummaries <- function(x){
+  iqr <- round(getIQR(x), 4)
+  coefvar <- round(getCoefVar(x), 4)
+  
+  return(c("IQR" = iqr, "coefVar" = coefvar))
+}
+```
+
+Using `getSummaries()` to return both calculations in one function
+
+```{r}
+#| results: hold
+
+acidity <- getSummaries(wine$fixed_acidity)
+cat("=== Fixed acidity ===\n")
+acidity
+
+citric <- getSummaries(wine$citric_acid)
+cat("\n=== Citric Acid ===\n")
+citric
+```
+
+"Inventing" a "new" function `%~%` (cbind in disguise)
+
+```{r}
+`%~%` <- function(a,b){
+  return(cbind(a,b))
+}
+```
+
+Creating some data to test the "new" function `%~%` on:
+
+```{r}
+df1 <- data.frame(unif = runif(10), norm = rnorm(10))
+df2 <- data.frame(gamma = rgamma(10, shape = 1), beta = rbeta(10, shape1 = 5, shape2 = 1))
+vec1 <- rnorm(10, mean = 10)
+```
+
+```{r}
+#| results: hold
+
+test1 <- df1%~%df2
+test2 <- df1%~%df2%~%vec1
+
+cat("=== Test 1: ===\n")
+test1
+cat("\n=== Test 2 ===\n")
+test2
+```
