@@ -8,7 +8,7 @@ editor: visual
 
 ### Task 1: Conceptual Questions
 
-1.  Yurp
+1.  To do this, you need to add "../", so you would need `read_csv("../MyData.csv")`. `../` will take you one step "back" in your working directory, and then you can navigate from there.
 2.  R projects function as a storage space for all information associated with a given... project. They have a separate workspace, working directory, and source documents, making it simpler and easier to keep all relevant files in one place.
 3.  Git is a version control software that allows multiple people to remotely work on the same project simultaneously. GitHub is the online interface for this software, and it doubles as a public distribution system for those projects.
 4.  Tibbles and data frames are very similar, but the main differences are that
@@ -20,11 +20,27 @@ editor: visual
 ```{r}
 library(tidyverse)
 ## The glass data has no headers
+glassColNames <- c('id', 'ri', 'na', 'mg', 'al', 'si', 'k', 'ca', 'ba', 'fe',
+                   'type')
 glass <- read_csv("https://www4.stat.ncsu.edu/~online/datasets/glass.data", 
-                  col_names = FALSE)
+                  col_names = glassColNames)
 
-## The yeast data
+glass
+```
+
+```{r}
+yeastColNames<-c('seq', 'mcg', 'gvh', 'alm', 'mit', 'erl', 'pox', 'vac', 'nuc', 'class')
+
 yeast <- read_delim("https://www4.stat.ncsu.edu/online/datasets/yeast.data", 
-                    delim = "  ", col_names = FALSE)
+                    delim = "  ", col_names = yeastColNames)
+yeast
+```
+### Task 3: Combining Excel and Delimited Data
+```{r}
+## Need the readxl package!
+library(readxl)
+
+white <- read_excel("HW_3/white-wine.xlsx", sheet = 1)
 
 ```
+
