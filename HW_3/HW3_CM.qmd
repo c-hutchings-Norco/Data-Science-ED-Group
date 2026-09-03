@@ -1,0 +1,30 @@
+---
+title: "HW3_CM"
+author: Cameron Mullaney
+date: today
+format: html
+editor: visual
+---
+
+### Task 1: Conceptual Questions
+
+1.  Yurp
+2.  R projects function as a storage space for all information associated with a given... project. They have a separate workspace, working directory, and source documents, making it simpler and easier to keep all relevant files in one place.
+3.  Git is a version control software that allows multiple people to remotely work on the same project simultaneously. GitHub is the online interface for this software, and it doubles as a public distribution system for those projects.
+4.  Tibbles and data frames are very similar, but the main differences are that
+    1.  Tibbles do less guessing when used (i.e. no partial matching), so errors come up earlier
+    2.  When printing, tibbles limit the number of rows printed to 10
+
+### Task 2: Reading Delimited Data
+
+```{r}
+library(tidyverse)
+## The glass data has no headers
+glass <- read_csv("https://www4.stat.ncsu.edu/~online/datasets/glass.data", 
+                  col_names = FALSE)
+
+## The yeast data
+yeast <- read_delim("https://www4.stat.ncsu.edu/online/datasets/yeast.data", 
+                    delim = "  ", col_names = FALSE)
+
+```
