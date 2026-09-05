@@ -22,3 +22,34 @@ format: html
 
     1.  The default `print()` method for a `tibble` has fancier printing: it shows the number of observations and columns and displays only the first few rows/columns.
     2.  `tibbles` do not coerce down to a vector when you subset to only one column using `[`.
+
+### Task 2: Reading Delimited Data
+
+Read in Glass data (comma-delimited).
+
+```{r}
+
+#bring in tidyverse library
+library(tidyverse)
+
+#read in glass data
+glass <- readr::read_csv("https://www4.stat.ncsu.edu/~online/datasets/glass.data",
+  col_names = c('Id', 'RI', 'Na', 'Mg', 'Al', 'Si', 'K', 'Ca', 'Ba', 'Fe', 'Type'))
+
+#print glass data
+glass
+```
+
+Read in Yeast data (space-delimited).
+
+```{r}
+
+#read in yeast data
+
+yeast <- readr::read_table("https://www4.stat.ncsu.edu/online/datasets/yeast.data",
+  col_names = c('seq_name', 'mcg', 'gvh', 'alm', 'mit', 'erl', 'pox', 'vac', 'nuc', 'class'))
+
+#print yeast data
+yeast
+```
+
