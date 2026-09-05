@@ -1,0 +1,24 @@
+---
+title: "Homework 3"
+author: "Emily Surrell"
+format: html
+---
+
+### Task 1: Conceptual Questions
+
+1.  If your working directory is `myfolder/homework/`, what relative path would you specify to get the file located at `myfolder/MyData.csv`?
+
+    The relative path would be `"../MyData.csv"`. The `../` moves from the working directory `myfolder/homework/` up one level to the directory `myfolder/`.
+
+2.  What are the major benefits of using `R` projects?
+
+    An `R` project is associated with a particular file folder, which becomes the working directory for the project. This works nicely with coding using relative paths. Also, when you render a `.qmd` file, the working directory for that rendering corresponds to the folder in which the `.qmd` file is located.
+
+3.  What is `Git` and what is `GitHub`?
+
+    `Git` is version control software, which is useful for tracking changes to files and collaborating with others. `GitHub` is an online hosting service for `Git`-based projects, allowing your repository to be accessed and stored on the web.
+
+4.  What are the two main differences between a `tibble` and a `data.frame`?
+
+    1.  The default `print()` method for a `tibble` has fancier printing: it shows the number of observations and columns and displays only the first few rows/columns.
+    2.  `tibbles` do not coerce down to a vector when you subset to only one column using `[`.
