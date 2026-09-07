@@ -131,5 +131,73 @@ wine_data <- bind_rows(white_wine_data, red_wine)
 wine_data
 ```
 
+## Writing a Function
+
+Write a function to calculate the IQR for a vector.  Remove any names and use unnamed arguments.
+```{r}
+?quantile
+getIQR <- function(vector) {
+  return(quantile(vector, 0.75, FALSE, FALSE)-quantile(vector,0.25, FALSE, FALSE))
+}
+```
+Apply getIQR function to the wine data frame on the fixed acidity and citric acid columns
+```{r}
+getIQR(wine_data$fixed_acidity)
+getIQR(wine_data$citric_acid)
+```
+
+Write a function to calculate the sample coefficient of variation by dividing the sample standard deviation by the absolute value of the mean.
+```{r}
+?sd
+?abs
+getCoefVar <- function(vector) {
+  sd(vector)/abs(mean(vector))
+}
+```
+Apply the getCoefVar function to the wine data frame on the fixed acidity and citric acid columns
+```{r}
+getCoefVar(wine_data$fixed_acidity)
+getCoefVar(wine_data$citric_acid)
+```
+
+Create a function that returns both the IQR and Coefficient of variation for a given vector by calling the already created functions and naming each element.
+```{r}
+getSummaries <- function(vector) {
+  return(c(IQR=getIQR(vector),Coef_Variation=getCoefVar(vector)))
+}
+```
+Apply get summaries function to the wine data frame on the fixed acidity and citric acid columns.
+```{r}
+getSummaries(wine_data$fixed_acidity)
+getSummaries(wine_data$citric_acid)
+```
+
+Write the infix function that can be used to add a data frame to a data frame or a vector.
+```{r}
+`%mybind%` <- function(df1, df2) {
+  cbind(df1, df2)
+}
+
+```
+Define the data frames and vector.  Change the vector to a data frame so there is a column label when combining the elements.
+```{r}
+df1 <- data.frame(unif = runif(10), norm = rnorm(10))
+df2 <- data.frame(gamma = rgamma(10, shape = 1), beta = rbeta(10, shape1 = 5, shape2 = 1))
+vec1 <- rnorm(10, mean = 10)
+df1
+df2
+vec1
+vec1_df <- data.frame(vec1)
+
+```
+Use the newly created infix function mybind to combine the data frames and vector defined above.  Combine both the vector and vector data frame separately.  Name the vector after combined or change to a data frame so it has a name.
+```{r}
+df1 %mybind% df2
+df2 %mybind% vec1_df
+df1 %mybind% df2 %mybind% vec1_df
+combined <- df1 %mybind% df2 %mybind% vec1
+names(combined) <- c('unif', 'norm', 'gamma', 'beta', 'vec1_norm')
+combined
+```
 
 
