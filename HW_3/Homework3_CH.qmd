@@ -1,0 +1,24 @@
+---
+title: "Homework 3"
+author: "Caroline Hutchings"
+date: today
+date-format: "MM/DD/YYYY"
+format: pdf
+editor: visual
+---
+
+# Homework 3 - Tidyverse
+
+## Conceptual Questions
+
+1.  If your working directory is myfolder/homework/, what relative path would you specify to get the file located at myfolder/MyData.csv? 
+    1. "../MyData.csv"
+2.  What are the major benefits of using R projects?
+    1.  I can create a project organization directly in RStudio, set the working directory, and manage git and github directly in RStudio (I love this!).
+3.  What is Git and what is GitHub?
+    1. Git is a version control software that is run locally on my computer.  It tracks changes to files and allows me to make those changes permanent or revert back to a previous version.
+    2. GitHub is a cloud-based platform that hosts git repositories.  It is a remote backup of repositories.  It allows collaboration between team members by tracking changes and allowing each team member to upload their changes and others to pull those changes to their local environment.  It also tracks versions and will alert the team member if there are merge conflicts allowing the team member to decide how to handle the conflicts.
+4.  What are the two main differences between a tibble and a data.frame?
+    1. If one column is called from a tibble the tibble allows the column to remain a tibble instead of a vector.
+    2. The tibble displays the data in a nicer format by only printing the data that is visible in the output.  It also lists the number of columns and rows along with all the column names and types.
+    3. Tibbles do not automatically convert character variables to factors. 
