@@ -23,6 +23,30 @@ editor: visual
 * When a tibble is printed, we get information about the number of observations and see an output of the first few columns. When a data frame is printed, the output is generally the entire data frame regardless of the number of observations.
 
 # Task 2: Reading Delimited Data
+Prepare session to read-in data sets
+```{r}
+library(tidyverse)
+```
+
+Read-in Data sets
+```{r}
+# Reading in glass data
+glass.data <- read_csv("https://www4.stat.ncsu.edu/online/datasets/glass.data",col_names = c("ID","RI","Na","Mg","Al","Si","K","Ca","Ba","Fe","Type of Glass")
+                       )
+
+# Print glass data tibble
+glass.data
+
+# Reading in yeast data
+yeast.data <- read_fwf("https://www4.stat.ncsu.edu/online/datasets/yeast.data",
+                       fwf_widths(c(12, 6, 6, 6, 6, 6, 6, 6, 6, 3),
+                                  c("seq_name","mcg","gvh","alm","mit","erl","pox","vac","nuc","class")
+                                  ))
+
+# Print yeast data tibble
+yeast.data
+```
+
 
 # Task 3: Combining Excel and Delimited Data
 
