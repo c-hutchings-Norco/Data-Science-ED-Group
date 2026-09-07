@@ -53,3 +53,101 @@ yeast <- readr::read_table("https://www4.stat.ncsu.edu/online/datasets/yeast.dat
 yeast
 ```
 
+### Task 3: Combining Excel and Delimited Data
+
+Read in first sheet from excel file.
+
+```{r}
+
+#bring in the readxl libarary
+library(readxl)
+
+#read in the white wine data
+white <- readxl::read_excel("white-wine.xlsx", sheet = 1)
+
+#print the white wine data
+white
+```
+
+Read in second sheet from excel file.
+
+```{r}
+
+#read in column names for the white wine data
+colnamesdata <- readxl::read_excel("white-wine.xlsx", sheet = 2)
+
+#print the column names for the white wine data
+colnamesdata
+```
+
+Use data from second sheet to overwrite column names from first sheet.
+
+```{r}
+#overwrite colnames from white dataset
+#t(colnamesdata) transposes colnamesdata from a column to a row
+colnames(white) <- t(colnamesdata)
+
+#print data
+white
+```
+
+Add a column to indicate the wines are white.
+
+```{r}
+
+#assign the value "white" to every observation of a column called type
+white$type <- "white"
+
+#print data
+white
+
+```
+
+Read in red wine data (semicolon-delimited).
+
+```{r}
+
+#read in red wine data
+red <- readr::read_delim("https://www4.stat.ncsu.edu/~online/datasets/red-wine.csv", delim = ";", col_types = "ddddddddddddd")
+
+#print data
+red
+```
+
+Replace the variable names in the red wine data.
+
+```{r}
+
+#overwrite colnames from red dataset
+#t(colnamesdata) transposes colnamesdata from a column to a row
+colnames(red) <- t(colnamesdata)
+
+#print data
+red
+
+```
+
+Append a column denoting the type as red.
+
+```{r}
+
+#assign the value "red" to every observation of a column called type
+red$type <- "red"
+
+#print data
+red
+
+```
+
+Combine the white and red wine data together.
+
+```{r}
+#bring in dplyr library
+library(dplyr)
+
+#combine white and red wine data into a single tibble
+wine <- dplyr::bind_rows(white, red)
+
+#print data
+wine
+```
