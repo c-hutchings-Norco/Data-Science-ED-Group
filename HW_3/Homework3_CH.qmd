@@ -22,3 +22,28 @@ editor: visual
     1. If one column is called from a tibble the tibble allows the column to remain a tibble instead of a vector.
     2. The tibble displays the data in a nicer format by only printing the data that is visible in the output.  It also lists the number of columns and rows along with all the column names and types.
     3. Tibbles do not automatically convert character variables to factors. 
+    
+## Reading Delimited Data
+
+### Glass Data
+
+Locate the glass data and read the comma separated values files into a tibble using the tidyverse function read_csv, but first load the library to load the functions in this session.
+
+```{r}
+library(readr)
+#?read_csv
+glass_data <- read_csv("https://www4.stat.ncsu.edu/online/datasets/glass.data", col_names=c("Id", "RI", "Na", "Mg", "Al", "Si", "K", "Ca", "Ba", "Fe", "Type"))
+glass_data
+```
+
+### Yeast Data
+
+Identify the correct number spaces for the start of each column to read the fixed width data into a tibble using the read_delim function since the data is fixed width not csv.
+Count the spaces for the start of each column
+ADT1_YEAST  0.58  0.61  0.47  0.13  0.50  0.00  0.48  0.22  MIT
+```{r}
+#?read_fwf
+yeast_data <- read_fwf('https://www4.stat.ncsu.edu/online/datasets/yeast.data', fwf_widths(c(12, 6, 6, 6, 6, 6, 6, 6, 6, 3), col_names=c("Sequence", "mcg", "gvh", "alm", "mit", "erl", "pox", "vac", "nuc", "class") ))
+yeast_data
+```
+
