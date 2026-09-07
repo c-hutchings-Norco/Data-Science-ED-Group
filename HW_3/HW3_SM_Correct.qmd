@@ -1,0 +1,228 @@
+---
+title: "HW3_SM"
+format: html
+editor: visual
+---
+
+# Task 1: Conceptual Questions
+
+1.  If your working directory is **myfolder/homework/**, what *relative* path would you specify to get the file located at **myfolder/MyData.csv**?
+
+- "../MyData.csv"
+
+2.  What are the major benefits of using R projects?
+
+- Allows for the creation of a file hierarchy when working on one project that contains multiple files
+- It's association with a directory allows for ease in sharing/ collaborating
+- R projects can be connected with Git and GitHub to allow for version control and collaboration
+
+3.  What is **Git** and what is **GitHub**?
+
+- Git: a software that allows for version tracking of different projects.
+- GitHub: an online hosting service for Git projects that allows for storage and sharing of these projects.
+
+4.  What are the two main differences between a **tibble** and a **data.frame**?
+
+- A tibble is a type of data frame that is specific to the tidy verse package. A data frame cannot exist in the tidyverse if it's not a tibble.
+- When a tibble is printed, we get information about the number of observations and see an output of the first few columns. When a data frame is printed, the output is generally the entire data frame regardless of the number of observations.
+
+# Task 2: Reading Delimited Data
+
+Prepare session to read-in data sets
+
+```{r}
+library(tidyverse)
+```
+
+Read-in Data sets
+
+```{r}
+# Reading in glass data
+glass.data <- read_csv("https://www4.stat.ncsu.edu/online/datasets/glass.data",col_names = c("ID","RI","Na","Mg","Al","Si","K","Ca","Ba","Fe","Type of Glass")
+                       )
+
+# Print glass data tibble
+glass.data
+
+# Reading in yeast data
+yeast.data <- read_fwf("https://www4.stat.ncsu.edu/online/datasets/yeast.data",
+                       fwf_widths(c(12, 6, 6, 6, 6, 6, 6, 6, 6, 3),
+                                  c("seq_name","mcg","gvh","alm","mit","erl","pox","vac","nuc","class")
+                                  ))
+
+# Print yeast data tibble
+yeast.data
+```
+
+# Task 3: Combining Excel and Delimited Data
+
+Prepare session to read in and combine excel and delimited data files
+
+```{r}
+library(readxl)
+library(readr)
+library(dplyr)
+```
+
+Read in white wine data set
+
+```{r}
+#Read in white wine data set
+white_wine.data <- read_excel("white-wine.xlsx",
+                              sheet = 1
+                              )
+
+#Print white wine tibble
+white_wine.data
+
+```
+
+Clean white wine data set
+
+```{r}
+
+#Correct variable column names
+wine_var_names <- read_excel("white-wine.xlsx",
+                              sheet = 2
+                           )
+colnames(white_wine.data) <- t(wine_var_names)
+
+#Add type column
+white_wine.data$type <- "white"
+
+#Print white wine tibble to confirm cleaning and column addition were successful
+white_wine.data 
+```
+
+Read in red wine data set
+
+```{r}
+red_wine.data <- read_delim("https://www4.stat.ncsu.edu/~online/datasets/red-wine.csv",
+                            delim = ";",show_col_types = FALSE)
+
+#Print red wine tibble
+red_wine.data
+```
+
+Clean red wine data set
+
+```{r}
+#Fix Column Names
+colnames(red_wine.data) <- t(wine_var_names)
+
+#Add type column
+red_wine.data$type <-"red"
+
+#Print red wine tibble to confirm cleaning and column addition were successful
+red_wine.data 
+```
+
+Combine red and white wine data sets into single tibble
+
+```{r}
+wine.data <- dplyr::bind_rows(white_wine.data,red_wine.data)
+
+#Print out wine data to observe if desired results occurred
+wine.data
+```
+
+# Task 4: Writing a Function
+
+Create IQR function that takes in a vector of numbers and returns interquartile range of that vector
+
+```{r}
+getIQR <- function(x){
+  p <- quantile(x, probs = c(0.25,0.75))
+  IQR <- (p[2]-p[1])
+  return(IQR)
+}
+```
+
+Apply IQR function to fixed_acidity and citric_acid columns from wine.data data set
+
+```{r}
+#Apply function to both columns
+fixed_IQR <- getIQR(wine.data$fixed_acidity)
+citric_IQR <- getIQR(wine.data$citric_acid)
+
+#Print results to see if desired outcome achieved
+fixed_IQR
+citric_IQR
+```
+
+Write a CV function that returns a sample's coefficient of variation.
+
+```{r}
+getCoefVar <- function(x){
+  return(sd(x)/mean(x))
+}
+```
+
+Apply CV function to fixed_acidity and citric_acid columns from wine.data data set
+
+```{r}
+#Apply function to both columns
+fixed_CV <- getCoefVar(wine.data$fixed_acidity)
+citric_CV <- getCoefVar(wine.data$citric_acid)
+
+#Print results to see if desired outcome achieved
+fixed_CV
+citric_CV
+```
+
+Create a summary function that takes in a vector and returns both the IQR and the CV of that vector
+
+```{r}
+getSummaries <- function(x){
+  return(list(IQR = getIQR(x), CV = getCoefVar(x)))
+}
+```
+
+Apply summary function to fixed_acidity and citric_acid columns from wine.data data set
+
+```{r}
+#Apply function to yeast data set
+fixed_sum <- getSummaries(wine.data$fixed_acidity)
+citric_sum <- getSummaries(wine.data$citric_acid)
+
+# Print results to see if desired outcome achieved
+fixed_sum
+citric_sum
+```
+
+Create own function to replace cbind function
+
+```{r}
+#Look at cbind code
+cbind
+
+#Create a function that mimics cbind
+'%getbind%'<- function(x,y){
+  return(cbind(x,y))
+}
+```
+
+Read-in practice data frames
+
+```{r}
+df1 <- data.frame(unif = runif(10), norm = rnorm(10))
+df2 <- data.frame(gamma = rgamma(10, shape = 1), beta = rbeta(10, shape1 = 5, shape2 = 1))
+vec1 <- rnorm(10, mean = 10)
+```
+
+Check custom function against practice data frames
+
+```{r}
+# Check against df1 and df2
+practice_1 <- df1%getbind%df2
+
+#Check anticipated results obtained
+practice_1
+
+#Check against df1, df2, and vec1
+practice_2 <- practice_1%getbind%vec1
+
+#Check anticipated results obtained
+practice_2
+
+```
