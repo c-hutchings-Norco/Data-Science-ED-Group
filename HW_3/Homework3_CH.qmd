@@ -47,3 +47,89 @@ yeast_data <- read_fwf('https://www4.stat.ncsu.edu/online/datasets/yeast.data', 
 yeast_data
 ```
 
+### Excel Data
+
+Set my working directory to be the root directory so it will render and run code from the same place.
+
+```{r}
+#install.packages("here")
+library(here)
+```
+
+
+Download the wine file and align the working directory and the directory the file is rendering from so I can indicate the correct location of the file for both.
+
+```{r}
+library(readxl)
+#?read_excel
+
+getwd()
+here()
+
+list.files()
+file.exists("white-wine.xlsx")
+file.exists("HW_3/white-wine.xlsx")
+
+
+```
+Open, load and render the wine file by specifying the location so I can access the file through the qmd file and when the file is rendered.
+```{r}
+white_wine_data <- read_excel(here("HW_3", "white-wine.xlsx"))
+white_wine_data
+```
+
+#### Combine Excel Files
+
+##### White Wine
+
+Read in the column names from the second sheet in the same white wine Excel file.
+
+```{r}
+wine_names <- read_excel(here("HW_3", "white-wine.xlsx"), sheet=2)
+wine_names
+```
+Add the column names to the white wine data file
+```{r}
+colnames(white_wine_data) <- wine_names$Variables
+white_wine_data
+```
+
+Add a new column that indicates all of the observations in the tibble are white wines.
+```{r}
+library(dplyr)
+white_wine_data <- white_wine_data |> 
+  mutate(type = 'White')
+white_wine_data
+```
+
+##### Red Wine
+
+Read in the semicolon delimited data into a red wine file.
+```{r}
+red_wine <- read_delim("https://www4.stat.ncsu.edu/~online/datasets/red-wine.csv", delim=';')
+red_wine
+```
+
+Rename the columns for the red wine to match the columns from the white wine.
+
+```{r}
+colnames(red_wine) <- wine_names$Variables
+red_wine
+```
+
+Add a new 'type' column and label each observation in the tibble as red.
+```{r}
+red_wine <- red_wine |> 
+  mutate(type = 'red')
+red_wine
+```
+
+Combine the white wine and red wine files to one file.
+```{r}
+?bind_rows
+wine_data <- bind_rows(white_wine_data, red_wine)
+wine_data
+```
+
+
+
