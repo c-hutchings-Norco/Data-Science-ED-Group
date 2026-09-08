@@ -151,3 +151,90 @@ wine <- dplyr::bind_rows(white, red)
 #print data
 wine
 ```
+
+### Task 4: Writing a Function
+
+Write getIQR function.
+
+```{r}
+
+getIQR <- function(vector){
+  if(!is.vector(vector)){
+    stop("Not a vector.")
+  }
+  return(as.vector(quantile(vector)[4] - quantile(vector)[2]))
+}
+
+```
+
+Use the getIQR function on `fixed_acidity` and `citric_acid`.
+
+```{r}
+
+getIQR(wine$fixed_acidity)
+getIQR(wine$citric_acid)
+
+```
+
+Write getCoefVar function.
+
+```{r}
+
+getCoefVar <- function(vector){
+  if(!is.vector(vector)){
+    stop("Not a vector.")
+  }
+  return(sd(vector) / abs(mean(vector)))
+}
+
+```
+
+Use the getCoefVar function on `fixed_acidity` and `citric_acid`.
+
+```{r}
+
+getCoefVar(wine$fixed_acidity)
+getCoefVar(wine$citric_acid)
+
+```
+Write getSummaries function.
+
+```{r}
+
+getSummaries <- function(vector){
+  if(!is.vector(vector)){
+    stop("Not a vector.")
+  }
+  return(c(IQR = getIQR(vector), CoefVar = getCoefVar(vector)))
+}
+
+```
+
+Use the getSummaries function on `fixed_acidity` and `citric_acid`.
+
+```{r}
+
+getSummaries(wine$fixed_acidity)
+getSummaries(wine$citric_acid)
+
+```
+
+Write infix function and test using it.
+
+```{r}
+#Write function
+`%+%` <- function(a, b){
+  return(cbind(a,b))
+}
+
+#Create test data
+df1 <- data.frame(unif = runif(10), norm = rnorm(10))
+df2 <- data.frame(gamma = rgamma(10, shape = 1), beta = rbeta(10, shape1 = 5, shape2 = 1))
+vec1 <- rnorm(10, mean = 10)
+
+#Use the function
+df1 %+% df2
+df1 %+% df2 %+% vec1
+
+```
+
