@@ -1,0 +1,9 @@
+---
+title: "Homework 4"
+author: "Emily Surrell"
+date: 9/14/2026
+format: html
+---
+
+
+### Task 1: Conceptual Questions
