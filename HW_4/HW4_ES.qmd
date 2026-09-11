@@ -5,5 +5,31 @@ date: 9/14/2026
 format: html
 ---
 
-
 ### Task 1: Conceptual Questions
+
+Bring in tidyverse library.
+
+```{r}
+library(tidyverse)
+```
+
+1.  Rewrite the following nested function call using **baseR**’s chaining operator:
+
+```         
+arrange(filter(select(as_tibble(iris), starts_with("Petal"), Species), Petal.Length < 1.55), Species)
+```
+
+Using chaining operator:
+
+```{r}
+as_tibble(iris) |>
+  select(starts_with("Petal"), Species) |>
+  filter(Petal.Length < 1.55) |>
+  arrange(Species)
+```
+
+2.  What is meant by long format data and wide format data? Which do we generally prefer for statistical analysis?
+
+    Long format data is structured such that each observation is a row and each variable is a column. Wide format data has more than one observation in a row.
+
+    Although wide format data can make for a nicer display, long format data is generally preferred for statistical analysis.
