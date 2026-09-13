@@ -5,13 +5,15 @@ date: 9/14/2026
 format: html
 ---
 
-### Task 1: Conceptual Questions
-
-Bring in tidyverse library.
+Bring in libraries needed for this assignment.
 
 ```{r}
 library(tidyverse)
+library(dplyr)
+library(readxl)
 ```
+
+### Task 1: Conceptual Questions
 
 1.  Rewrite the following nested function call using **baseR**’s chaining operator:
 
@@ -33,3 +35,82 @@ as_tibble(iris) |>
     Long format data is structured such that each observation is a row and each variable is a column. Wide format data has more than one observation in a row.
 
     Although wide format data can make for a nicer display, long format data is generally preferred for statistical analysis.
+
+### Task 2: Chaining Practice
+
+#### Glass Data
+
+Read in glass data.
+
+```{r}
+glass <- read_csv("https://www4.stat.ncsu.edu/~online/datasets/glass.data", col_names = c('Id', 'RI', 'Na', 'Mg', 'Al', 'Si', 'K', 'Ca', 'Ba', 'Fe', 'Type_of_glass'))
+```
+
+Clean glass data with chaining.
+
+```{r}
+glass <- glass |>
+  mutate(Type_of_glass = factor(Type_of_glass, 1:7, c('building_windows_float_processed','building_windows_non_float_processed','vehicle_windows_float_processed','vehicle_windows_non_float_processed','containers','tableware','headlamps'))) |>
+  filter(Fe < 0.2, (Type_of_glass %in% c('tableware', 'headlamps')))
+
+#print results
+glass
+```
+
+#### Yeast Data
+
+Read in yeast data.
+
+```{r}
+yeast <- read_table("https://www4.stat.ncsu.edu/online/datasets/yeast.data", col_names = c('seq_name', 'mcg', 'gvh', 'alm', 'mit', 'erl', 'pox', 'vac', 'nuc', 'class'))
+```
+
+Clean yeast data with chaining.
+
+```{r}
+yeast <- yeast |>
+  select(!c(seq_name,nuc)) |>
+  group_by(class) |>
+  mutate(across(where(is.numeric), list(mean=mean, median=median), .names = "{.col}_{.fn}"))
+
+#print results
+yeast
+```
+
+#### Wine Data
+
+Read in and combine wine data.
+
+```{r}
+#white wine
+white <- read_excel("../HW_3/white-wine.xlsx", sheet = 1)
+colnamesdata <- read_excel("../HW_3/white-wine.xlsx", sheet = 2)
+colnames(white) <- t(colnamesdata)
+white$type <- "white"
+
+#red wine
+red <- read_delim("https://www4.stat.ncsu.edu/~online/datasets/red-wine.csv", delim = ";")
+colnames(red) <- t(colnamesdata)
+red$type <- "red"
+
+#combine
+wine <- dplyr::bind_rows(white, red)
+```
+
+Clean wine data with chaining.
+
+```{r}
+wine <- wine |>
+  filter(quality > 6.5, alcohol < 13.2) |>
+  arrange(desc(quality)) |>
+  select(contains("acid"), alcohol, type, quality) |>
+  group_by(quality) |>
+  mutate(mean_alcohol = mean(alcohol),
+        sd_alcohol = sd(alcohol))
+
+#print results
+wine
+
+```
+
+### Task 3: Database Practice
