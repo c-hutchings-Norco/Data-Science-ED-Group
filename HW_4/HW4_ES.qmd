@@ -11,6 +11,8 @@ Bring in libraries needed for this assignment.
 library(tidyverse)
 library(dplyr)
 library(readxl)
+library(DBI)
+library(RSQLite)
 ```
 
 ### Task 1: Conceptual Questions
@@ -106,7 +108,7 @@ wine <- wine |>
   select(contains("acid"), alcohol, type, quality) |>
   group_by(quality) |>
   mutate(mean_alcohol = mean(alcohol),
-        sd_alcohol = sd(alcohol))
+         sd_alcohol = sd(alcohol))
 
 #print results
 wine
@@ -114,3 +116,85 @@ wine
 ```
 
 ### Task 3: Database Practice
+
+Connect to the Lahman database.
+
+```{r}
+con <- dbConnect(RSQLite::SQLite(), "lahman.db")
+```
+
+List out the tables in the database.
+
+```{r}
+dbListTables(con)
+```
+
+Use the `tbl()` function and `dplyr` to return all of the data from the `Teams` table for the year 2015.
+
+```{r}
+tbl(con, "Teams") |>
+  filter(yearID==2015) |>
+  collect()
+```
+
+Repeat the above by using the `sql()` function within `tbl()`.
+
+```{r}
+tbl(con, sql(
+  "select *
+  from `Teams`
+  where (`yearID` = 2015)")
+  ) |>
+  collect()
+```
+
+Return all of the players in the hall of fame, the year they were voted into the hall of fame, and their category.
+
+```{r}
+tbl(con, "HallOfFame") |>
+  filter(inducted=="Y") |>
+  select(playerID, yearID, category) |>
+  collect()
+```
+
+Combine the table from the previous question with the `People` table in order to have the `nameFirst` and `nameLast` names added to what was returned above.
+
+```{r}
+HallOfFame <- left_join(
+  tbl(con, "HallOfFame") |> filter(inducted=="Y") |> select(playerID, yearID, category),
+  tbl(con, "People") |> select(playerID, nameFirst, nameLast),
+  by = "playerID") |>
+  collect()
+
+#print results
+HallOfFame
+```
+
+Summarize data on Managers.
+
+```{r}
+Managers <- tbl(con, "Managers") |>
+  select(playerID, G, W, L) |>
+  group_by(playerID) |>
+  summarize(G_managed = sum(G, na.rm = TRUE),
+  Total_W = sum(W, na.rm = TRUE),
+  Total_L = sum(L, na.rm = TRUE)) |>
+  collect() |>
+  mutate(WinPercent = Total_W/G_managed) |>
+  arrange(desc(WinPercent))
+
+#print results
+Managers
+```
+
+Return information for only the people that managed a team and were inducted into the hall of fame.
+
+```{r}
+inner_join(HallOfFame, Managers, by = "playerID")
+```
+
+Disconnect from the database.
+
+```{r}
+dbDisconnect(con)
+```
