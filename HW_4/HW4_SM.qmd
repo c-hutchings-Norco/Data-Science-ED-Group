@@ -4,6 +4,13 @@ author: Sofia Mariano
 format: html
 editor: visual
 ---
+Prepare session to read-in data sets and perform various functions
+```{r}
+library(tidyverse)
+library(readr)
+library(dplyr)
+library(readxl)
+```
 
 # Task 1: Conceptual Questions
 
@@ -11,12 +18,10 @@ editor: visual
 
 ```{r}
 # original code:
-library(tidyverse)
 arrange(filter(select(as_tibble(iris), starts_with("Petal"), Species), Petal.Length <
 1.55), Species)
 
 # Re-written code:
-library(tidyverse)
 iris_tbl<- as_tibble(iris) |>
   dplyr::select(starts_with("Petal"), Species) |>
   dplyr::filter(Petal.Length < 1.55) |>
@@ -32,24 +37,75 @@ iris_tbl
 
 # Task 2:
 ## Glass Data
-Prepare session to read-in data sets
+Read in original code from HW3
 ```{r}
-library(tidyverse)
-```
-
-```{r}
-# Read in original code from HW3
-glass.data <- readr::read_csv("https://www4.stat.ncsu.edu/online/datasets/glass.data",col_names = c("ID","RI","Na","Mg","Al","Si","K","Ca","Ba","Fe","Type of Glass")
+glass.data <- readr::read_csv("https://www4.stat.ncsu.edu/online/datasets/glass.data", col_names = c("ID","RI","Na","Mg","Al","Si","K","Ca","Ba","Fe","Type_of_Glass")
                        )
 glass.data
+```
 
-# Overwrite Type_of_Glass variable with string labels
+Modify Glass Dataset code
+```{r}
 glass.data |>
-  
+  dplyr::mutate(Type_of_Glass = factor(Type_of_Glass, 1:7, c("building_windows_float_processed", "build
+ing_windows_non_float_processed", "vehicle_windows_float_processed", "vehicle_windows_non_float_processed", "containers", "tableware", "headlamps"))
+) |>
+  dplyr::filter(Fe < 0.2 & Type_of_Glass %in% c("tableware", "headlamp"))
+glass.data
+
 ```
 
 ## Yeast Data
+Read-in original code from HW3
+```{r}
+yeast.data <- readr::read_fwf("https://www4.stat.ncsu.edu/online/datasets/yeast.data",
+                       fwf_widths(c(12, 6, 6, 6, 6, 6, 6, 6, 6, 3),
+                                (c("seq_name","mcg","gvh","alm","mit","erl","pox","vac","nuc","class")
+                                  ))
+)
+yeast.data
+```
+
+Perform data modifications
+```{r}
+yeast.data |>
+  dplyr::select(mcg:vac, class) |>
+  dplyr::group_by(class) |>
+  dplyr::mutate(across(where(is.numeric), mean, .names = "{.col}_mean"))
+```
 
 ## Wine Data
+Read-in original code from HW3
+```{r}
+#Read in and modify white wine data set
+white_wine.data <- readxl::read_excel("../HW_3/white-wine.xlsx",
+                              sheet = 1
+                              )
+wine_var_names <- readxl::read_excel("../HW_3/white-wine.xlsx",
+                              sheet = 2
+                           )
+colnames(white_wine.data) <- t(wine_var_names) # reading and correcting column names
+white_wine.data$type <- "white"# adding wine type
+
+# Read in and modify read wine data set
+red_wine.data <- readr::read_delim("https://www4.stat.ncsu.edu/~online/datasets/red-wine.csv",
+                            delim = ";",show_col_types = FALSE)
+colnames(red_wine.data) <- t(wine_var_names)#Fix Column Names
+red_wine.data$type <-"red"#Add type column
+
+# Combine red and white wine into single data set
+wine.data <- dplyr::bind_rows(white_wine.data,red_wine.data)
+wine.data
+```
+
+Modify data set
+```{r}
+wine.data |>
+  dplyr::filter(quality > 6.5 & alcohol < 132) |>
+  dplyr::arrange(desc(quality)) |>
+  dplyr::select(1:3,alcohol, type, quality) |>
+  dplyr::group_by(quality) |>
+  dplyr::mutate(across(alcohol, list(mean = mean, sd = sd)))
+```
 
 # Task 3: Database Practice
