@@ -1,6 +1,10 @@
 ---
-title: "HW4_CM"
+title: "Homework 4"
+author: Cameron Mullaney
+date: today
 format: html
+warning: false
+results: hold
 ---
 
 ```{r}
@@ -108,4 +112,80 @@ wine |>
   mutate("alc.mean" = mean(alcohol)) |>
   mutate("alc.sd" = sd(alcohol))
 
+```
+
+## Task 3: Database Practice
+
+11. task
+
+```{r}
+con <- dbConnect(RSQLite::SQLite(), "lahman.db")
+dbListTables(con)
+```
+
+12. Using `tbl()` and `dplyr` to pull 2015 teams
+
+```{r}
+tbl(con, "Teams")|>
+  filter(yearID == 2015)
+```
+
+13. Using `tbl()` and `sql()` to pull 2015 teams
+
+```{r}
+tbl(con, sql(
+  "SELECT *
+  FROM `Teams`
+  WHERE (`yearID` = 2015)")
+  )
+```
+
+14. All players in the Hall of Fame
+
+```{r}
+HOF <- tbl(con, "HallOfFame")|>
+  filter(inducted == "Y")|>
+  select(playerID, yearID, category)
+
+HOF
+```
+
+15. Add in their names from the 'People' table
+
+```{r}
+HOF <- HOF|>
+  left_join((tbl(con, "People") |> select(playerID, nameFirst, nameLast)), 
+             by = "playerID"
+  )|>
+  collect()
+HOF
+```
+
+16. Manager Stats
+
+```{r}
+Mgr <- tbl(con, "Managers")|>
+  select(playerID, G, W, L) |>
+  group_by(playerID)|>
+  summarize(totG = sum(G, na.rm = TRUE),
+            totW = sum(W, na.rm = TRUE),
+            totL = sum(L, na.rm = TRUE)) |>
+  collect() |>
+  mutate(Wpct = (totW / totG)*100)|>
+  arrange(desc(Wpct))
+
+Mgr
+```
+
+17. somethin!
+
+```{r}
+HOF |>
+  inner_join(Mgr, by = "playerID")
+```
+
+Finally, we disconnect from the database.
+
+```{r}
+dbDisconnect(con)
 ```
