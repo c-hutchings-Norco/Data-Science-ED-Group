@@ -1,0 +1,111 @@
+---
+title: "HW4_CM"
+format: html
+---
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(RSQLite)
+```
+
+## Task 1: Conceptual Questions
+
+1.  Nested function (baseR)
+
+```{r}
+iris |>
+  as.tibble() |>
+  select(starts_with("Petal"), Species) |>
+  filter(Petal.Length > 1.55) |>
+  arrange(Species)
+```
+
+2.  "Long format" refers to the more common data layout, where each row corresponds to a single observation or data point, often (but not always) separated by time. "Wide format" data features multiple grouped observations in a single row, united by a common variable (city, week, team, etc.). Data in this format is typically more difficult to analyze, and usually requires transformation into long format data, which is preferred for statistical analysis.
+
+## Task 2: Data Handling
+
+#### Glass Data
+
+```{r}
+glassColNames <- c('id', 'ri', 'na', 'mg', 'al', 'si', 'k', 'ca', 'ba', 'fe', 'type_of_glass')
+glass <- read_csv('https://www4.stat.ncsu.edu/~online/datasets/glass.data', 
+                  col_names = glassColNames)
+```
+
+3.  Type of glass
+4.  Filtering
+
+```{r}
+## 3 ##
+glass |>
+  mutate(type_of_glass = factor(type_of_glass, 1:7, 
+                                c('building_windows_float_processed',
+                                  'building_windows_non_float_processed',
+                                  'vehicle_windows_float_processed', 
+                                  'vehicle_windows_non_float_processed',
+                                  'containers',
+                                  'tableware',
+                                  'headlamps'))) |>
+## 4 ##
+  filter(fe < 0.2, type_of_glass %in% c('tableware', 'headlamps'))
+```
+
+#### Yeast Data
+
+```{r}
+yeastColNames<-c('seq', 'mcg', 'gvh', 'alm', 'mit', 'erl', 'pox', 'vac', 'nuc', 'class')
+
+yeast <- read_table("https://www4.stat.ncsu.edu/online/datasets/yeast.data",
+                    col_names = yeastColNames, show_col_types = FALSE)
+yeast
+```
+
+5.  Drop columns
+6.  Add group means
+
+```{r}
+yeast |>
+## 5 ##
+  select(-c(seq, nuc)) |>
+## 6 ##
+  group_by(class) |>
+  mutate(across(where(is.numeric), mean, .names = "mean_{.col}"))
+
+```
+
+#### Wine Data
+
+```{r}
+## Read in each wine sheet
+
+white <- read_excel("../HW_3/white-wine.xlsx", sheet = 1, .name_repair = "universal") |>
+  mutate(color = "white")
+  
+red <- read_delim("https://www4.stat.ncsu.edu/~online/datasets/red-wine.csv", 
+                  delim = ";", name_repair = "universal") |>
+  mutate(color = "red")
+
+## Bind together
+wine <- dplyr::bind_rows(white, red)
+```
+
+7.  Filter to high-quality wines
+8.  Sort by quality (descending)
+9.  Select certain columns
+10. Calculated alcohol mean & standard deviation grouped by quality
+
+```{r}
+wine |>
+## 7 ##
+  filter(quality > 6.5, alcohol < 13.2)|>
+## 8 ##
+  arrange(desc(quality))|>
+## 9 ## 
+  select(contains("acid"), alcohol, color, quality) |>
+## 10 ##
+  group_by(quality) |>
+  mutate("alc.mean" = mean(alcohol)) |>
+  mutate("alc.sd" = sd(alcohol))
+
+```
