@@ -145,3 +145,53 @@ dplyr::tbl(lahman, "HallOfFame") |>
   dplyr::select(playerID, yearID, category) |>
   collect()
 ```
+
+Combine with People information
+```{r}
+# Look at original People table
+dplyr::tbl(lahman, "People")
+
+# Join with hall of fame table
+hall_of_fame <- dplyr::left_join(
+  dplyr::tbl(lahman, "HallOfFame") |>
+    dplyr::filter(inducted == 'Y') |>
+    dplyr::select(playerID, yearID, category)
+  ,
+  dplyr::tbl(lahman, "People") |>
+    dplyr::select(playerID, nameFirst, nameLast)
+  ,
+  by = c("playerID")
+  ) |>
+collect()
+hall_of_fame
+```
+
+Create manager table
+```{r}
+# Look at original Managers table
+dplyr::tbl(lahman, "Managers")
+
+# Create managers table
+manager <- dplyr::tbl(lahman, "Managers") |>
+  dplyr::select(playerID, G, W, L) |>
+  dplyr::group_by(playerID) |>
+  dplyr::summarize(G_managed = sum(G, na.rm = TRUE),
+    Total_W = sum(W, na.rm = TRUE),
+    Total_L = sum(L, na.rm = TRUE)
+    ) |>
+  collect() |>
+  dplyr::mutate(Career_W_Percentage = Total_W/G_managed) |>
+  dplyr::arrange(desc(Total_W/G_managed))
+manager
+```
+
+Join manager and hall of fame tables
+```{r}
+dplyr::inner_join(manager, hall_of_fame, by = c("playerID"))
+```
+
+Disconnect from database
+```{r}
+dbDisconnect(lahman)
+```
+
