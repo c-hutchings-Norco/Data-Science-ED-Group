@@ -10,6 +10,8 @@ library(tidyverse)
 library(readr)
 library(dplyr)
 library(readxl)
+library(DBI)
+library(RSQLite)
 ```
 
 # Task 1: Conceptual Questions
@@ -109,3 +111,26 @@ wine.data |>
 ```
 
 # Task 3: Database Practice
+Read in Lahman data base
+```{r}
+# Connect database
+lahman <- DBI::dbConnect(RSQLite::SQLite(), "lahman.db")
+
+# look at tables within database
+DBI::dbListTables(lahman)
+```
+
+Return data from Teams table in 2015
+```{r}
+# Return data using dplyr
+dplyr::tbl(lahman, "Teams") |>
+  dplyr::filter(yearID == 2015) |>
+  collect()
+
+# Return data using SQL
+dplyr::tbl(lahman, sql("select *
+                        From Teams
+                       where yearID = 2015")) |>
+  collect()
+```
+
