@@ -1,0 +1,8 @@
+---
+title: "Homework 4"
+author: "Caroline Hutchings"
+date: today
+date-format: "MM/DD/YYYY"
+format: pdf
+editor: visual
+---
