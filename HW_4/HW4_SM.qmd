@@ -194,4 +194,3 @@ Disconnect from database
 ```{r}
 dbDisconnect(lahman)
 ```
-
