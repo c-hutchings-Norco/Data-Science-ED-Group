@@ -189,7 +189,7 @@ Mgr <- tbl(con, "Managers")|>
 Mgr
 ```
 
-17. Combine 15 & 16 to list all HOF members who managed at least one game
+17. Combine 15 & 16 to list all HOF members who managed at least one game.
 
 ```{r}
 HOF |>
