@@ -38,4 +38,72 @@ as_tibble(iris) |>
 
 # Task 2:
 ## Glass Data
+Read in original Hw3 code
+```{r}
+glass <- readr::read_csv("https://www4.stat.ncsu.edu/~online/datasets/glass.data",
+  col_names = c('Id', 'RI', 'Na', 'Mg', 'Al', 'Si', 'K', 'Ca', 'Ba', 'Fe', 'Type_of_Glass'))
+```
+
+Modify data set to change **glass type** variable output and keep observations where **Fe** < 0.2 and **glass type** is "tableware" or "headlamp"
+
+```{r}
+glass <- glass|>
+  dplyr::mutate(Type_of_Glass = factor(Type_of_Glass, 1:7, c('building_windows_float_processed','building_windows_non_float_processed','vehicle_windows_float_processed','vehicle_windows_non_float_processed','containers','tableware','headlamps'))) |>
+  dplyr::filter(Fe < 0.2, (Type_of_Glass %in% c('tableware', 'headlamps'))
+         )
+# Print results
+glass
+```
+
+## Yeast Data
+Read in original HW3 code
+```{r}
+yeast <- readr::read_table("https://www4.stat.ncsu.edu/online/datasets/yeast.data",
+  col_names = c('seq_name', 'mcg', 'gvh', 'alm', 'mit', 'erl', 'pox', 'vac', 'nuc', 'class'))
+
+```
+
+Modify dataset to remove **seq_name** and **nuc** columns and ad columns corresponding to the mean and media of each numeric variable at each **class** grouping.
+```{r}
+yeast <- yeast |> 
+  dplyr::select(mcg:vac, class) |> 
+  dplyr::group_by(class) |> 
+  dplyr::mutate(across(where(is.numeric), c(mean=mean, median=median), .names='{.fn}_{.col}')) 
+
+# Print results
+yeast
+```
+
+
+## Wine Data
+Read in original HW3 code
+```{r}
+#white wine
+white <- readxl::read_excel("../HW_3/white-wine.xlsx", sheet = 1)
+colnamesdata <- readxl::read_excel("../HW_3/white-wine.xlsx", sheet = 2)
+colnames(white) <- t(colnamesdata)
+white$type <- "white"
+
+#red wine
+red <- readr::read_delim("https://www4.stat.ncsu.edu/~online/datasets/red-wine.csv", delim = ";")
+colnames(red) <- t(colnamesdata)
+red$type <- "red"
+
+#combine
+wine <- dplyr::bind_rows(white, red)
+```
+
+Modify data set to look at **quality** > 6.5, **alcohol** < 13.2, sort data from highest to lowest **quality**, print variables that contain only **acid**, **alcohol**, **type**, and **quality**, and determine the mean and standard deviation of **alcohol** based on each setting of **quality**
+```{r}
+wine <- wine |> 
+  dplyr::filter(quality > 6.5, alcohol < 13.2) |> 
+  dplyr::arrange(desc(quality)) |> 
+  dplyr::select(contains('acid'), alcohol, type, quality) |> 
+  dplyr::group_by(quality) |> 
+  dplyr::mutate(across(alcohol, c(mean=mean, std= sd), .names='{.fn}_{.col}'))
+
+# Print results
+wine
+```
+
 
