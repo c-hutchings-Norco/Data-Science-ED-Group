@@ -1,0 +1,41 @@
+---
+title: "HW4_Group"
+author: "ST 558 Group 5"
+date: 9/15/2026
+format: html
+---
+Prepare session to perform tasks
+```{r}
+library(tidyverse)
+library(dplyr)
+library(readxl)
+library(readr)
+library(DBI)
+library(RSQLite)
+```
+
+# Task 1: Conceptual Questions
+1. Rewrite the following nested call function using **baseR**'s chaining operator:
+
+library(tidyverse)
+arrange(filter(select(as_tibble(iris), starts_with("Petal"), Species), Petal.Length <
+1.55), Species)
+
+```{r}
+as_tibble(iris) |>
+  dplyr::select(starts_with("Petal"), Species) |>
+  dplyr::filter(Petal.Length < 1.55) |>
+  dplyr::arrange(Species)
+```
+
+2. What is meant by long format data and wide format data? Which do we generally prefer for statistical analysis?
+
+* Long format data refers to structured data where each row is one observation and each column is one variable.
+
+* Wide format data refers to structured data with more than one observation present in a single row.  These observations are often united by a common variable.
+
+* For statistical analysis, long format data is generally preferred.
+
+# Task 2:
+## Glass Data
+
