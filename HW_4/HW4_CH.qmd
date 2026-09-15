@@ -6,3 +6,27 @@ date-format: "MM/DD/YYYY"
 format: pdf
 editor: visual
 ---
+
+## Conceptual Questions
+
+library(tidyverse) arrange(filter(select(as_tibble(iris), starts_with("Petal"), Species), Petal.Length \< 1.55), Species)
+
+1.  Rewrite using baseR chaining operator
+
+```{r}
+library(tidyverse)
+iris |> 
+  as_tibble() |> 
+  select(starts_with("Petal"), Species) |>
+  filter(Petal.Length<1.55) |> 
+  arrange(Species)
+```
+
+2.  What is meant by long format data and wide format data?
+    1.  Long format is a data table organization where each row is one observation and each column is a variable. Repeated measures are stored in additional rows. This is the ideal format when working with structured data for statistical analysis.
+    2.  Wide format is where there can be multiple observations per row. Repeated measures are stored in additional columns instead of additional rows. Sometimes this makes the data easier to read in a table format.
+3.  Which do we generally prefer for statistical analysis? We generally prefer the long format to do analyses on. This enables us to do analysis on the variables and include each observation separately, not necessarily each individual though as some rows may be repeated measures on the same individual.
+
+## Task 2
+
+### Glass Data
