@@ -99,6 +99,8 @@ wine_data <- wine_data |>
 
 ```
 
+# Task 3
+
 ## Database Practice
 
 Connect to the database and open all the tables in the database.
