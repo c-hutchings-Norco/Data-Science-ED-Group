@@ -1,7 +1,13 @@
 ---
-title: "HW4_CM"
+title: "Homework 4"
+author: Cameron Mullaney
+date: today
 format: html
+warning: false
+results: hold
 ---
+
+First, loading in the necessary packages:
 
 ```{r}
 library(tidyverse)
@@ -11,7 +17,7 @@ library(RSQLite)
 
 ## Task 1: Conceptual Questions
 
-1.  Nested function (baseR)
+1.  Nested function in baseR
 
 ```{r}
 iris |>
@@ -27,14 +33,17 @@ iris |>
 
 #### Glass Data
 
+Pulling in, naming, and manipulating a csv from the web
+
 ```{r}
 glassColNames <- c('id', 'ri', 'na', 'mg', 'al', 'si', 'k', 'ca', 'ba', 'fe', 'type_of_glass')
 glass <- read_csv('https://www4.stat.ncsu.edu/~online/datasets/glass.data', 
                   col_names = glassColNames)
+glass
 ```
 
-3.  Type of glass
-4.  Filtering
+3.  Providing names to `type_of_glass` column, and treating it as a factor
+4.  Filtering by `fe` and `type_of_glass`
 
 ```{r}
 ## 3 ##
@@ -53,6 +62,8 @@ glass |>
 
 #### Yeast Data
 
+Loading in a data table from the web and providing column names
+
 ```{r}
 yeastColNames<-c('seq', 'mcg', 'gvh', 'alm', 'mit', 'erl', 'pox', 'vac', 'nuc', 'class')
 
@@ -61,8 +72,8 @@ yeast <- read_table("https://www4.stat.ncsu.edu/online/datasets/yeast.data",
 yeast
 ```
 
-5.  Drop columns
-6.  Add group means
+5.  Drop columns `seq` and `nuc`
+6.  Add columns for the means of each numeric variable, grouped by `class`
 
 ```{r}
 yeast |>
@@ -70,11 +81,17 @@ yeast |>
   select(-c(seq, nuc)) |>
 ## 6 ##
   group_by(class) |>
-  mutate(across(where(is.numeric), mean, .names = "mean_{.col}"))
+  mutate(across(where(is.numeric), 
+                list(mean = mean, median = median),
+                .names = "{.col}_{.fn}"))
 
 ```
 
 #### Wine Data
+
+Loading in data from a .xlsx file (white wine) and from a *semicolon-separated values* file (red wine)
+
+Then including a column to specify wine color, and stacking the two data sets using `dplyr::bind_rows`
 
 ```{r}
 ## Read in each wine sheet
@@ -90,10 +107,10 @@ red <- read_delim("https://www4.stat.ncsu.edu/~online/datasets/red-wine.csv",
 wine <- dplyr::bind_rows(white, red)
 ```
 
-7.  Filter to high-quality wines
-8.  Sort by quality (descending)
-9.  Select certain columns
-10. Calculated alcohol mean & standard deviation grouped by quality
+7.  Filter to high-quality wines (using `quality`)
+8.  Sort by `quality` (descending)
+9.  Select acid, `color`, and `quality` columns
+10. Calculate `alcohol` mean & standard deviation grouped by `quality`
 
 ```{r}
 wine |>
@@ -108,4 +125,79 @@ wine |>
   mutate("alc.mean" = mean(alcohol)) |>
   mutate("alc.sd" = sd(alcohol))
 
+```
+
+## Task 3: Database Practice
+
+11. Connect to database in repo, and view list of tables
+
+```{r}
+con <- dbConnect(RSQLite::SQLite(), "lahman.db")
+dbListTables(con)
+```
+
+12. Using `tbl()` and `dplyr` to pull 2015 teams
+
+```{r}
+tbl(con, "Teams")|>
+  filter(yearID == 2015)
+```
+
+13. Using `tbl()` and `sql()` to pull 2015 teams
+
+```{r}
+tbl(con, sql(
+  "SELECT *
+  FROM `Teams`
+  WHERE (`yearID` = 2015)")
+  )
+```
+
+14. All players in the Hall of Fame
+
+```{r}
+HOF <- tbl(con, "HallOfFame")|>
+  filter(inducted == "Y")|>
+  select(playerID, yearID, category)
+
+HOF
+```
+
+15. Add in their names from the 'People' table
+
+```{r}
+HOF <- HOF|>
+  left_join((tbl(con, "People") |> select(playerID, nameFirst, nameLast)), 
+             by = "playerID")|>
+  collect()
+HOF
+```
+
+16. Manager Stats
+
+```{r}
+Mgr <- tbl(con, "Managers")|>
+  select(playerID, G, W, L) |>
+  group_by(playerID)|>
+  summarize(totG = sum(G, na.rm = TRUE),
+            totW = sum(W, na.rm = TRUE),
+            totL = sum(L, na.rm = TRUE)) |>
+  collect() |>
+  mutate(Wpct = (totW / totG)*100)|>
+  arrange(desc(Wpct))
+
+Mgr
+```
+
+17. Combine 15 & 16 to list all HOF members who managed at least one game.
+
+```{r}
+HOF |>
+  inner_join(Mgr, by = "playerID")
+```
+
+Finally, disconnect from the database.
+
+```{r}
+dbDisconnect(con)
 ```
