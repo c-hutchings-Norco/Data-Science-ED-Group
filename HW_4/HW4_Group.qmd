@@ -106,4 +106,79 @@ wine <- wine |>
 wine
 ```
 
+# Task 3: Database Practice
+Connect to database and view tables
+```{r}
+con <- DBI::dbConnect(RSQLite::SQLite(), "lahman.db")
+dbListTables(con)
+```
+
+Return Teams table from 2015 using dplyr
+```{r}
+dplyr::tbl(con, "Teams")|>
+  dplyr::filter(yearID == 2015)|>
+  collect()
+```
+
+Returm Teams table from 2015 using sql
+```{r}
+dplyr::tbl(con, sql(
+  "SELECT *
+  FROM `Teams`
+  WHERE (`yearID` = 2015)")
+  )|>
+  collect()
+```
+
+From **HallOfFame** table, return players inducted, year voted in, and category
+```{r}
+dplyr::tbl(con, "HallOfFame") |>
+  dplyr::filter(inducted == 'Y') |>
+  dplyr::select(playerID, yearID, category) |>
+  collect()
+```
+
+Combine **HallOfFame** table with  **People** table to have **nameFirst** and **nameLast** returned in addition to the table above
+```{r}
+hall_of_fame <- dplyr::left_join(
+  dplyr::tbl(con, "HallOfFame") |>
+    dplyr::filter(inducted == 'Y') |>
+    dplyr::select(playerID, yearID, category)
+  ,
+  dplyr::tbl(con, "People") |>
+    dplyr::select(playerID, nameFirst, nameLast)
+  ,
+  by = c("playerID")
+  ) |>
+collect()
+
+# Print results
+hall_of_fame
+```
+
+Return **playerID**, **G**, **W**, and **L** columns from the **Managers** table using chaining
+```{r}
+Managers <- dplyr::tbl(con, "Managers") |>
+  dplyr::select(playerID, G, W, L) |>
+  dplyr::group_by(playerID) |>
+  dplyr::summarize(G_managed = sum(G, na.rm = TRUE),
+                   Total_W = sum(W, na.rm = TRUE),
+                   Total_L = sum(L, na.rm = TRUE)) |>
+  dplyr::collect() |>
+  dplyr::mutate(WinPercent = Total_W/G_managed) |>
+  dplyr::arrange(desc(WinPercent))
+
+# Print results
+Managers
+```
+
+Combine results from previous two questions to return information from people that managed a team and were inducted into the hall of fame
+```{r}
+dplyr::inner_join(Managers, hall_of_fame, by = "playerID")
+```
+
+Disconnect from the Database
+```{r}
+dbDisconnect(con)
+```
 
