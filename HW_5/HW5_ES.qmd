@@ -1,0 +1,60 @@
+---
+title: "Homework 5"
+author: "Emily Surrell"
+date: 9/21/2026
+format: html
+---
+
+Bring in libraries needed for this assignment.
+
+```{r}
+library(httr)
+library(jsonlite)
+library(tidyverse)
+```
+
+### Task 1: Querying an API and a Tidy-Style Function
+
+Use `GET()` from the `httr` package to return information about a topic in the news.
+
+```{r}
+getresult <- GET("https://newsapi.org/v2/everything?q=Dolly%20Parton&from=2026-09-01&language=en&pageSize=50&apiKey=2c43d850c570494389b660ffaf1757db")
+```
+
+Parse what is returned.
+
+```{r}
+parsedresult <- fromJSON(rawToChar(getresult$content))
+newsdata <- as_tibble(parsedresult$articles)
+
+#print results
+newsdata
+```
+
+Write a function that allows the user to query this API.
+
+```{r}
+querynews <- function(subject, time, key){
+  
+  getresult <- GET(paste0("https://newsapi.org/v2/everything?q=", 
+                          gsub(" ", "%20", subject), 
+                          "&from=", 
+                          time, 
+                          "&language=en&pageSize=50&apiKey=", 
+                          key))
+  
+  parsedresult <- fromJSON(rawToChar(getresult$content))
+  return(as_tibble(parsedresult$articles))
+}
+```
+
+Examples using the function:
+
+```{r}
+key <- "2c43d850c570494389b660ffaf1757db"
+
+querynews("Nashville International Airport", "2026-09-05", key)
+querynews("Miley Cyrus", "2026-08-20", key)
+```
+
+### Task 2: Summarizing Roller Coaster Data
