@@ -66,7 +66,7 @@ yeast <- readr::read_table("https://www4.stat.ncsu.edu/online/datasets/yeast.dat
 Modify dataset to remove **seq_name** and **nuc** columns and ad columns corresponding to the mean and media of each numeric variable at each **class** grouping.
 ```{r}
 yeast <- yeast |> 
-  dplyr::select(mcg:vac, class) |> 
+  dplyr::select(!c(seq_name,nuc)) |> 
   dplyr::group_by(class) |> 
   dplyr::mutate(across(where(is.numeric), c(mean=mean, median=median), .names='{.fn}_{.col}')) 
 
