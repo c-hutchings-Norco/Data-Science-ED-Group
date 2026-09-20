@@ -108,3 +108,46 @@ Variables with missing values are:
 - Make has 36 missing values
 - Length has 33 missing values
 - Max Height has 8 missing values
+
+### Categorical Variables
+
+Create a one-way contingency table for Type. The table shows there are 530 steel and 105 wood roller coasters.
+
+```{r}
+table(roller_coaster$Type)
+```
+
+Create a two-way contingency table for Type (Wood or Steel) and Inversions (Yes or No). Most of the roller coasters with inversions are steel, of the 170 coasters with inversions, 166 are steel and 4 are wood.
+
+```{r}
+table(roller_coaster$Type, roller_coaster$`Inversions?`)
+
+prop.table(table(roller_coaster$Type, roller_coaster$`Inversions?`))
+```
+
+Create a three-way contingency table for Type (Steel, Wood), Inversions (Yes, No) and Age Group (Newest, Recent, Older). Only the newest wood roller coasters have any inversions. The older and recent wood roller coasters do not have any inversions. In addition, only 8 of the older steel roller coasters have any inversions. Indicating that perhaps advancing technology is required for inversions and especially inversions for wood roller coasters.
+
+```{r}
+table(roller_coaster$Type, roller_coaster$`Inversions?`, roller_coaster$AgeGroup)
+```
+
+Create a conditional two-way table using filter().
+
+```{r}
+steel <- roller_coaster |> 
+  filter(Type=='Steel') 
+
+table(steel$AgeGroup, steel$`Inversions?`)
+```
+
+Create a conditional table by sub setting a three-way contingency table.
+
+```{r}
+table(roller_coaster$Type, roller_coaster$AgeGroup, roller_coaster$`Inversions?`)["Steel",,]
+```
+
+Create a conditional table using dplyr functions groupby and summarize.
+
+```{r}
+
+```
