@@ -6,6 +6,8 @@ editor: source
 ---
 Prepare session to read-in documents
 ```{r}
+library(httr)
+library(jsonlite)
 library(tidyverse)
 library(readr)
 library(ggplot2)
@@ -13,6 +15,47 @@ library(psych)
 ```
 
 # Task 1: Querying an API and a Tidy-Style Function
+1. Return information about a topic I'm interested in from a recent (<30 days ago) news article.
+```{r}
+result <- httr::GET("https://newsapi.org/v2/everything?q=Fat%20Bear%20Week&from=2026-09-01&language=en&pageSize=50&apiKey=08d9b583ee2b43778c63502990e5d57c")
+```
+
+2. Parse results/ check output contents of article referenced in 1.
+```{r}
+parsed <- jsonlite::fromJSON(rawToChar(result$content))
+fat_bear <- dplyr::as_tibble(parsed$articles)
+
+# Print results
+fat_bear
+```
+
+3. Create a function to queary API.  Function will include title/ subject to search, time period to search from, and API key
+Function Creation:
+```{r}
+search_news <- function(title, time, key){
+  result <- httr::GET(paste0("https://newsapi.org/v2/everything?q=",
+                             title,
+                             "&from=",
+                             time,
+                             "&language=en&pageSize=50&apiKey=",
+                             key
+))
+  parsed <- jsonlite::fromJSON(rawToChar(result$content))
+  return(dplyr::as_tibble(parsed$articles))
+}
+```
+
+Test Function two times:
+```{r}
+key <- "08d9b583ee2b43778c63502990e5d57c"
+
+# Test 1 with Christmas
+search_news("Christmas", "2026-09-07", key)
+
+# Test 2 with Goose
+search_news("Goose", "2026-09-18", key)
+```
+
 # Task 2: Summarizing Roller Coaster Data
 Read-in data set and convert variables to factors as needed
 ```{r}
@@ -46,11 +89,12 @@ colSums(is.na(coaster))
 
 ## Categorical Variables
 6. Create one-, two-, and three-way contingency tables from one of the variables that was transformed to be a factor variable
-one-way contingency table
+
+One-way contingency table
 ```{r}
 table(coaster$Design)
 ```
-Interpretation: With a frequency of 560/635, this value indicates that sit down roller coasters make up the majority of roller coasters in this dataset.
+Interpretation: With a frequency of 560/635, this value indicates that sit down roller coasters make up the majority of roller coasters in this data set.
 
 Two-way contingency table:
 ```{r}
@@ -63,7 +107,7 @@ Three-way contingency table:
 # three-way contingency table
 table(coaster$Design, coaster$Type, coaster$AgeGroup)
 ```
-Interpretation: A value of 20 indicates that of the newest inverted roller coasters, all of them were made out of steel compared to wood.
+Interpretation: A value of 20 indicates that of the newest inverted roller coasters, 20 of them (in this case all of them) were made out of steel compared to wood.
 
 7. Create a conditional two-way table using table() via two different methods.
 Method 1: subset the data, then create a two-way table
@@ -97,6 +141,7 @@ coaster |>
 ```
 
 9. Create stacked and side-by-side bar graph.  Give relevant x and y labels and plot titles.
+
 Stacked plot:
 ```{r}
 stacked <- ggplot2::ggplot(data = coaster |>
