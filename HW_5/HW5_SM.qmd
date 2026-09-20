@@ -9,6 +9,7 @@ Prepare session to read-in documents
 library(tidyverse)
 library(readr)
 library(ggplot2)
+library(psych)
 ```
 
 # Task 1: Querying an API and a Tidy-Style Function
@@ -35,7 +36,12 @@ str(coaster)
 
 Data summary:
 ```{r}
+psych::describe(coaster)
+```
 
+5. Documenting rate of missing values
+```{r}
+colSums(is.na(coaster))
 ```
 
 ## Categorical Variables
@@ -44,13 +50,13 @@ one-way contingency table
 ```{r}
 table(coaster$Design)
 ```
-Interpretation: With a frequency of 560/635, this data indicates that sit down roller coasters make up the majority of roller coasters in this dataset.
+Interpretation: With a frequency of 560/635, this value indicates that sit down roller coasters make up the majority of roller coasters in this dataset.
 
 Two-way contingency table:
 ```{r}
 table(coaster$Design, coaster$Type)
 ```
-Interpretation: A value of 1 indicates that out of the 4 bobsled roller coasters in this dataset, one is made out of wood, making it a less popular building material compared to steel.
+Interpretation: A value of 1 indicates that out of the 4 bobsled roller coasters in this dataset, one is made out of wood, making it a less popular building material compared to steel for this type of roller coaster design.
 
 Three-way contingency table:
 ```{r}
