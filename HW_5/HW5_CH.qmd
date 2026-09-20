@@ -60,3 +60,51 @@ get_news('NCAA', "2026-08-20", api_key)
 
 get_news("Economy", "2026-08-20", api_key)
 ```
+
+## Task 2 Summarizing Data
+
+Read in data to roller coaster tibble and remove unwanted variables.
+
+```{r}
+library(readr)
+library(tidyverse)
+
+roller_coaster <- read_csv('https://www4.stat.ncsu.edu/online/datasets/635USrollercoasters.csv')
+
+names(roller_coaster)
+
+#remove unwanted variables
+roller_coaster <- roller_coaster |> 
+  select(-Latitude, -Longitude, -Boundary)
+```
+
+Identify qualitative variables that should be factors - these variables should not have a large number of levels. Therefore, Park and Make are not appropriate variables to change to factors. Change remaining variables to factors.
+
+```{r}
+
+#identify qualitative variables that should be factors
+unique_counts <- roller_coaster |> summarize(across(c(AgeGroup, Scale, Park, `Census Region`, Type, Design, `Inversions?`, Make), n_distinct))
+
+#unique_counts
+
+#force appropriate qualitative variables to be factors
+roller_coaster <- roller_coaster |> 
+  mutate(across(c(AgeGroup, Scale, `Census Region`, Type, Design, `Inversions?`), as.factor))
+```
+
+Identify missing values for each variable in the data set.
+
+```{r}
+
+colSums(is.na(roller_coaster))
+
+```
+
+Variables with missing values are:
+
+- Drop has 128 missing values
+- Top Speed has 74 missing values
+- Duration has 66 missing values
+- Make has 36 missing values
+- Length has 33 missing values
+- Max Height has 8 missing values
