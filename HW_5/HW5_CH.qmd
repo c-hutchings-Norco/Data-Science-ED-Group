@@ -146,8 +146,23 @@ Create a conditional table by sub setting a three-way contingency table.
 table(roller_coaster$Type, roller_coaster$AgeGroup, roller_coaster$`Inversions?`)["Steel",,]
 ```
 
-Create a conditional table using dplyr functions groupby and summarize.
+Create a two-way contingency table using dplyr functions groupby and summarize.
 
 ```{r}
+roller_coaster |> 
+  group_by(Type, `Inversions?`) |> 
+  drop_na(Type, `Inversions?`) |> 
+  summarize(count=n()) |> 
+  pivot_wider(names_from = Type, values_from = count)
+```
 
+Create a stacked and side by side bar plot
+
+```{r}
+library(ggplot2)
+#stacked bar chart
+ggplot(roller_coaster, aes(x=Type, fill=AgeGroup))+ geom_bar() + labs(title = "Roller Coaster Age Group by Type", x='Type', y='Count')
+
+#side by side bar chart
+ggplot(roller_coaster, aes(x=Type, fill=AgeGroup))+ geom_bar(position='dodge') + labs(title = "Roller Coaster Age Group by Type", x='Type', y='Count')
 ```
