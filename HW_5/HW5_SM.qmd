@@ -13,8 +13,31 @@ library(ggplot2)
 
 # Task 1: Querying an API and a Tidy-Style Function
 # Task 2: Summarizing Roller Coaster Data
+Read-in data set and convert variables to factors as needed
+```{r}
+coaster <- readr::read_csv("https://www4.stat.ncsu.edu/online/datasets/635USrollercoasters.csv")
+
+coaster <- coaster |>
+  dplyr::mutate(AgeGroup = as.factor(AgeGroup),
+                Scale = as.factor(Scale),
+                Type = as.factor(Type),
+                Design = as.factor(Design),
+                'Inversions?' = as.factor('Inversions?')
+                )
+```
 
 ## Basic EDA
+4. Look at data storage and summary.
+Data storage:
+```{r}
+str(coaster)
+```
+
+Data summary:
+```{r}
+
+```
+
 ## Categorical Variables
 6. Create one-, two-, and three-way contingency tables from one of the variables that was transformed to be a factor variable
 one-way contingency table
