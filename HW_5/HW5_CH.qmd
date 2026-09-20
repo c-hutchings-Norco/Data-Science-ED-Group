@@ -4,3 +4,59 @@ author: "Caroline Hutchings"
 format: html
 editor: visual
 ---
+
+## Task 1 Querying an API
+
+```{r}
+#install.packages("httr")
+install.packages("jsonlite")
+library(httr)
+library(jsonlite)
+library(dplyr)
+
+el_nino <- GET("https://newsapi.org/v2/everything?q=el%20nino&from=2026-08-20&sortBy=publishedAt&apiKey=0c0a26f9583b46fba0b935e610e59bf6")
+
+el_nino
+
+names(el_nino)
+
+parsed <- fromJSON(rawToChar(el_nino$content))
+
+names(parsed)
+
+el_nino_news <- as_tibble(parsed$articles)
+
+el_nino_news
+```
+
+### Create an API Function
+
+```{r}
+get_news <- function(subject, time_frame, key) {
+  url_news <- paste0("https://newsapi.org/v2/everything?q=",
+    subject,
+    "&from=",
+    time_frame,
+    "&language=en",
+    "&pageSize=50",
+    "&apiKey=",
+    key)
+  #use the url to get the data
+  data <- GET(url_news)
+  #parse the JSON data 
+  parsed <- fromJSON(rawToChar(data$content))
+  #create a tibble from the parsed data
+  tibble_data <- as_tibble(parsed$articles)
+  #return the tibble with all the data
+  return(tibble_data)
+}
+
+api_key <- "0c0a26f9583b46fba0b935e610e59bf6"
+
+#Use function
+get_news("tesla", "2026-08-20", api_key)
+
+get_news('NCAA', "2026-08-20", api_key)
+
+get_news("Economy", "2026-08-20", api_key)
+```
