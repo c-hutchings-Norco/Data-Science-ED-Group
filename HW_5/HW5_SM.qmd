@@ -4,3 +4,90 @@ author: "Sofia Mariano"
 format: html
 editor: source
 ---
+Prepare session to read-in documents
+```{r}
+library(tidyverse)
+library(readr)
+library(ggplot2)
+```
+
+# Task 1: Querying an API and a Tidy-Style Function
+# Task 2: Summarizing Roller Coaster Data
+
+## Basic EDA
+## Categorical Variables
+6. Create one-, two-, and three-way contingency tables from one of the variables that was transformed to be a factor variable
+one-way contingency table
+```{r}
+table(coaster$Design)
+```
+Interpretation: With a frequency of 560/635, this data indicates that sit down roller coasters make up the majority of roller coasters in this dataset.
+
+Two-way contingency table:
+```{r}
+table(coaster$Design, coaster$Type)
+```
+Interpretation: A value of 1 indicates that out of the 4 bobsled roller coasters in this dataset, one is made out of wood, making it a less popular building material compared to steel.
+
+Three-way contingency table:
+```{r}
+# three-way contingency table
+table(coaster$Design, coaster$Type, coaster$AgeGroup)
+```
+Interpretation: A value of 20 indicates that of the newest inverted roller coasters, all of them were made out of steel compared to wood.
+
+7. Create a conditional two-way table using table() via two different methods.
+Method 1: subset the data, then create a two-way table
+```{r}
+long <- filter(coaster, Duration > 100)
+table(long$Design, long$Scale)
+```
+
+Method 2: create a three-way table, then subset into a two-way
+```{r}
+three_way <- table(coaster$State, coaster$AgeGroup, coaster$Scale)
+three_way[,,"Extreme"]
+```
+
+8. Create a two-way contingency table using dplyr functions.
+
+```{r}
+coaster |>
+  dplyr::group_by(AgeGroup, Scale) |>
+  tidyr::drop_na(AgeGroup, Scale) |>
+  dplyr::summarize(count = n())
+```
+
+Use pivot_wider to make output look like table() output.
+```{r}
+coaster |>
+  dplyr::group_by(AgeGroup, Scale) |>
+  tidyr::drop_na(AgeGroup, Scale) |>
+  dplyr::summarize(count = n()) |>
+  tidyr::pivot_wider(names_from = AgeGroup, values_from = count)
+```
+
+9. Create stacked and side-by-side bar graph.  Give relevant x and y labels and plot titles.
+Stacked plot:
+```{r}
+stacked <- ggplot2::ggplot(data = coaster |>
+                           drop_na(AgeGroup, Scale),
+                           aes(x = AgeGroup,
+                               fill = Scale))
+stacked + ggplot2::geom_bar() + 
+  ggplot2::labs(x = "Roller Coaster Relative Age Group", 
+                y = "Number of Roller Coasters",
+                title = "Relative Roller Coaster Age compared to Roller Coaster Scale Rating")
+```
+
+Side-by-Side plot:
+```{r}
+cluster <- ggplot2::ggplot(data = coaster |>
+                           drop_na(AgeGroup, Scale),
+                           aes(x = AgeGroup,
+                               fill = Scale))
+cluster + ggplot2::geom_bar(position = "dodge") + 
+  ggplot2::labs(x = "Roller Coaster Relative Age Group", 
+                y = "Number of Roller Coasters",
+                title = "Relative Roller Coaster Age compared to Roller Coaster Scale Rating")
+```
