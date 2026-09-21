@@ -1,0 +1,196 @@
+---
+title: "Homework 5"
+format: html
+author: Cameron Mullaney
+date: today
+warning: false
+---
+
+Pulling in some relevant packages
+
+```{r}
+library(httr)
+library(jsonlite)
+library(tidyverse)
+```
+
+## Task 1: Querying an API
+
+#### 1. Using `GET()`
+
+```{r}
+turtles <- GET("https://newsapi.org/v2/everything?q=turtle&from=2026-09-15&language=en&apiKey=a86e58b83b9b4212a6fc377f18b228f9")
+turtles
+```
+
+#### 2. Parsing the result
+
+This is a very complicated object, looking through and find an article list
+
+```{r}
+names(turtles)
+article.list <- fromJSON(rawToChar(turtles$content))
+article.list <- as.tibble(select(article.list$articles, 2:8))
+article.list
+```
+
+#### 3. Querying with a function
+
+##### a. Function writing
+
+```{r}
+newsQuery <- function(subject, date, key){
+  url <- paste0("https://newsapi.org/v2/everything?q=",
+                gsub(" ", "%20", subject), 
+                "&from=", date,
+                "&language=en&apiKey=", key)
+  query <- GET(url)
+  
+  art.list <- fromJSON(rawToChar(query$content))
+  art.list <- as.tibble(select(art.list$articles, 2:8))
+  return(art.list)
+}
+```
+
+##### b. Function testing
+
+```{r}
+test1 <- newsQuery(subject = "rats", 
+                  date = "2026-09-10", 
+                  key = "a86e58b83b9b4212a6fc377f18b228f9")
+test1
+```
+
+```{r}
+test2 <- newsQuery(subject = "climate change", 
+                   date = "2026-09-05", 
+                   key = "a86e58b83b9b4212a6fc377f18b228f9")
+test2
+```
+
+## Task 2 - Roller Coaster Data
+
+Read in the data!
+
+```{r}
+coaster <- read_csv("https://www4.stat.ncsu.edu/online/datasets/635USrollercoasters.csv", name_repair = "universal")
+```
+
+Now, cleaning the data, treating factors as such. Dropping `Latitude`, `Longitude`, and `Boundary`.
+
+```{r}
+coaster <- coaster |> 
+  rename("Inversions" = "Inversions.")|>
+  rename("NumInversions" = "..of.Inversions") |>
+  mutate(AgeGroup = as.factor(AgeGroup),
+         Scale = as.factor(Scale),
+         Type = as.factor(Type),
+         Design = as.factor(Design),
+         Inversions = as.factor(Inversions)) |>
+  select(-c(19:21))
+coaster
+```
+
+#### 4. Take a look at data structure / storage:
+
+```{r}
+str(coaster)
+```
+
+These look good! All the data types make sense. Taking a look with `summary()`:
+
+```{r}
+summary(coaster)
+```
+
+#### 5. Document missing values
+
+Seems like there are some NA values in `TopSpeed`, `MaxHeight`, `Drop`, `Length`, and `Duration`. Let's check more thoroughly with `is.na()`:
+
+```{r}
+colSums(is.na(coaster))
+```
+
+Looks like there are some NAs in the character columns too. Good to know.
+
+### Contingency Tables
+
+#### 6. Basic Tables
+
+Table 1:
+
+```{r}
+#| results: hold
+
+cat("=== Table 1: Regions === \n")
+table(coaster$Census.Region)
+
+```
+
+This table shows us that the southern census region has the most (223) rollercoasters from this list
+
+```{r}
+#| results: hold
+
+cat("=== Table 2: Age Group and Scale ===\n")
+table(coaster$AgeGroup, coaster$Scale)
+```
+
+This list shows us that there are 147 "Extreme" coasters that are also recently constructed
+
+```{r}
+#| results: hold
+cat("=== Table 3: Scale, Region, and Inversions ===\n")
+table(coaster$Scale, coaster$Census.Region, coaster$Inversions)
+```
+
+This three-way table shows us that there are notably fewer coasters with inversions, and that all of them are categorized as "Extreme".
+
+#### 7. Conditional Tables
+
+```{r}
+#| results: hold
+wooden <- filter(coaster, Type == "Wood")
+cat("=== Scale & Design, Wooden Coasters ===\n")
+table(wooden$Scale, wooden$Design)
+```
+
+This table shows us that there is one singular wooden coaster of design "Bobsled", and that it's scale is "Thrill"
+
+```{r}
+#| results: hold
+cat("=== Region & Type, Old Coasters ===\n")
+oldcoaster <- table(coaster$Census.Region, coaster$Type, coaster$AgeGroup)
+oldcoaster[, , 1]
+```
+
+#### 8. Tidyverse contingency
+
+```{r}
+tidytable <- coaster |> 
+  group_by(Census.Region, Scale) |>
+  summarize(count = n())
+
+tidytable
+tidytable |> pivot_wider(names_from = Census.Region, values_from = count)
+```
+
+#### 9. Figures
+
+##### Stacked Bars
+
+```{r}
+stacked <- ggplot(data = coaster, aes(x = Census.Region, fill = AgeGroup))+
+  geom_bar()+
+  labs(x = "Region", y = "Count", title = "Regional coasters by recency of construction")
+stacked
+```
+
+##### Side-by-side bars
+
+```{r}
+sbs <- ggplot(data = coaster, aes(x = Scale, fill = Type))+
+  geom_bar(position = "dodge")+
+  labs(x = "Excitement Scale", y = "count", title = "Excitement level by material")
+sbs
+```
