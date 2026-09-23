@@ -184,11 +184,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ dplyr     1.2.0     ✔ readr     2.1.6
 ✔ forcats   1.0.1     ✔ stringr   1.6.0
-✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ ggplot2   4.0.2     ✔ tibble    3.3.1
 ✔ lubridate 1.9.5     ✔ tidyr     1.3.2
-✔ purrr     1.2.2     
+✔ purrr     1.2.1     
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
@@ -544,31 +544,31 @@ dbl (12): fixed acidity, volatile acidity, citric acid, residual sugar, chlo...
 <span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a><span class="co">#Use the function</span></span>
 <span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>df1 <span class="sc">%+%</span> df2</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>         unif       norm     gamma      beta
-1  0.75623309 -0.5579442 1.3000078 0.9813775
-2  0.99894685 -0.2652331 3.2437223 0.9242384
-3  0.20783549 -1.0740534 0.3828190 0.3798733
-4  0.05453009  0.6163924 4.4438647 0.7524754
-5  0.85389856  0.7084169 0.2562104 0.6960698
-6  0.45506666 -1.2240996 1.0479871 0.8954007
-7  0.55055874 -0.2179323 3.8232990 0.7919483
-8  0.89865421 -0.6482605 0.1602845 0.6794841
-9  0.66709653 -0.9846672 0.6000972 0.8322021
-10 0.99602510  1.8488739 1.1773176 0.9626030</code></pre>
+<pre><code>         unif       norm      gamma      beta
+1  0.94514883  0.2397394 0.08723937 0.8876286
+2  0.80949262 -1.1834656 0.50744662 0.8070229
+3  0.53660982  1.2824589 1.26897705 0.7945773
+4  0.81577562 -0.2186596 0.71882364 0.9649349
+5  0.95289966  0.6949276 0.23023268 0.8649586
+6  0.76943222  0.8006750 3.08205263 0.8309773
+7  0.62017823  2.1792861 0.05101034 0.9017286
+8  0.04174561 -0.7386489 1.87133008 0.7785172
+9  0.22990767 -1.4450408 0.54756434 0.7598769
+10 0.11339272  0.1063526 0.44224121 0.8995522</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>df1 <span class="sc">%+%</span> df2 <span class="sc">%+%</span> vec1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>         unif       norm     gamma      beta         b
-1  0.75623309 -0.5579442 1.3000078 0.9813775 11.002284
-2  0.99894685 -0.2652331 3.2437223 0.9242384  9.860765
-3  0.20783549 -1.0740534 0.3828190 0.3798733  9.429842
-4  0.05453009  0.6163924 4.4438647 0.7524754  9.531118
-5  0.85389856  0.7084169 0.2562104 0.6960698  9.094011
-6  0.45506666 -1.2240996 1.0479871 0.8954007  9.791914
-7  0.55055874 -0.2179323 3.8232990 0.7919483  8.990114
-8  0.89865421 -0.6482605 0.1602845 0.6794841 11.455191
-9  0.66709653 -0.9846672 0.6000972 0.8322021 10.402293
-10 0.99602510  1.8488739 1.1773176 0.9626030  9.932415</code></pre>
+<pre><code>         unif       norm      gamma      beta         b
+1  0.94514883  0.2397394 0.08723937 0.8876286 10.192562
+2  0.80949262 -1.1834656 0.50744662 0.8070229  9.888856
+3  0.53660982  1.2824589 1.26897705 0.7945773 10.873784
+4  0.81577562 -0.2186596 0.71882364 0.9649349  9.240862
+5  0.95289966  0.6949276 0.23023268 0.8649586 10.228445
+6  0.76943222  0.8006750 3.08205263 0.8309773 10.991301
+7  0.62017823  2.1792861 0.05101034 0.9017286 11.175782
+8  0.04174561 -0.7386489 1.87133008 0.7785172  9.792426
+9  0.22990767 -1.4450408 0.54756434 0.7598769  9.973381
+10 0.11339272  0.1063526 0.44224121 0.8995522 10.136886</code></pre>
 </div>
 </div>
 
