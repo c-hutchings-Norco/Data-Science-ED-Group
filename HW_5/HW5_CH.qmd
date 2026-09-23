@@ -9,7 +9,7 @@ editor: visual
 
 ```{r}
 #install.packages("httr")
-install.packages("jsonlite")
+#install.packages("jsonlite")
 library(httr)
 library(jsonlite)
 library(dplyr)

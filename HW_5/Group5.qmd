@@ -1,0 +1,172 @@
+---
+title: "Homework 5"
+author: "Group 5"
+date: 9/23/2026
+format: html
+---
+
+Bring in libraries needed for this assignment.
+
+```{r}
+library(httr)
+library(jsonlite)
+library(tidyverse)
+library(dplyr)
+library(psych)
+```
+
+### Task 1: Querying an API and a Tidy-Style Function
+
+Use `GET()` from the `httr` package to return information about a topic in the news.
+
+```{r}
+getresult <- GET("https://newsapi.org/v2/everything?q=Dolly%20Parton&from=2026-09-01&language=en&pageSize=50&apiKey=2c43d850c570494389b660ffaf1757db")
+```
+
+Parse what is returned.
+
+```{r}
+parsedresult <- fromJSON(rawToChar(getresult$content))
+newsdata <- as_tibble(parsedresult$articles)
+
+#print results
+newsdata
+```
+
+Write a function that allows the user to query this API.
+
+```{r}
+querynews <- function(subject, time, key){
+  
+  getresult <- GET(paste0("https://newsapi.org/v2/everything?q=", 
+                          gsub(" ", "%20", subject), 
+                          "&from=", 
+                          time, 
+                          "&language=en&pageSize=50&apiKey=", 
+                          key))
+  
+  parsedresult <- fromJSON(rawToChar(getresult$content))
+  return(as_tibble(parsedresult$articles))
+}
+```
+
+Examples using the function:
+
+```{r}
+key <- "2c43d850c570494389b660ffaf1757db"
+
+querynews("Nashville International Airport", "2026-09-05", key)
+querynews("Miley Cyrus", "2026-08-20", key)
+```
+
+### Task 2: Summarizing Roller Coaster Data
+
+Read in roller coaster data and convert variables to factors as needed.
+
+```{r}
+rollercoasters <- read_csv("http://www4.stat.ncsu.edu/online/datasets/635USrollercoasters.csv")
+
+rollercoasters <- rollercoasters |>
+  mutate(across(c(AgeGroup, Scale, `Census Region`, Type, Design, `Inversions?`), as.factor))
+```
+
+Look at how the data is stored.
+
+```{r}
+str(rollercoasters)
+```
+
+Look at a summary of the data.
+
+```{r}
+psych::describe(rollercoasters)
+```
+
+Count missing values.
+
+```{r}
+colSums(is.na(rollercoasters))
+```
+
+One-way contingency table using `table()`:
+
+```{r}
+table(rollercoasters$AgeGroup, useNA="always")
+```
+
+The above table shows that 376 roller coasters are in the newest age group.
+
+Two-way contingency table using `table()`:
+
+```{r}
+table(rollercoasters$AgeGroup,
+      rollercoasters$Scale,
+      useNA = "always")
+```
+
+The above table shows that 14 roller coasters are in the newest age group and are considered Kiddie roller coasters.
+
+Three-way contingency table using `table()`:
+
+```{r}
+table(rollercoasters$AgeGroup,
+      rollercoasters$Scale,
+      rollercoasters$Type,
+      useNA = "always")
+```
+
+The above tables show that there are 4 Kiddie roller coasters that are in the older age group and that are made of Steel.
+
+Next, we will create a table showing counts between AgeGroup and Scale, limited to when Type is "Wood". We will do this using two different methods:
+
+1.  Conditional two-way table using `table()`, by sub-setting the data first:
+
+```{r}
+filtered <- filter(rollercoasters, Type == "Wood")
+
+table(filtered$AgeGroup,
+      filtered$Scale,
+      useNA = "always")
+```
+
+2.  Conditional two-way table using `table()`, by creating a three-way table and then sub-setting it:
+
+```{r}
+three_way <- table(rollercoasters$AgeGroup,
+      rollercoasters$Scale,
+      rollercoasters$Type,
+      useNA = "always")
+
+three_way[,,"Wood"]
+```
+
+Two-way contingency table using `group_by()`, `summarize()`, and `pivot_wider()`:
+
+```{r}
+rollercoasters |>
+  group_by(AgeGroup, Scale) |>
+  summarize(count = n()) |>
+  pivot_wider(names_from = Scale, values_from = count)
+```
+
+Stacked bar graph:
+
+```{r}
+stackedbar <- ggplot(data = rollercoasters, aes(x=Scale, fill=AgeGroup))
+stackedbar + geom_bar() +
+   labs(x = "Scale", 
+        y = "Number of Roller Coasters", 
+        fill = "Age Group", 
+        title = "Roller Coasters by Scale and Age Group")
+```
+
+Side-by-side bar graph:
+
+```{r}
+sidebysidebar <- ggplot(data = rollercoasters, aes(x=Scale, fill=AgeGroup))
+sidebysidebar + geom_bar(position = "dodge") +
+   labs(x = "Scale", 
+        y = "Number of Roller Coasters", 
+        fill = "Age Group", 
+        title = "Roller Coasters by Scale and Age Group")
+```

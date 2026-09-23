@@ -5,6 +5,8 @@ date: today
 date-format: "MM/DD/YYYY"
 format: pdf
 editor: visual
+editor_options: 
+  chunk_output_type: inline
 ---
 
 # Homework 3 - Tidyverse
@@ -61,14 +63,15 @@ Download the wine file and align the working directory and the directory the fil
 
 ```{r}
 library(readxl)
+library(here)
 #?read_excel
 
-getwd()
-here()
+#getwd()
+#here()
 
-list.files()
-file.exists("white-wine.xlsx")
-file.exists("HW_3/white-wine.xlsx")
+#list.files()
+#file.exists("white-wine.xlsx")
+#file.exists("HW_3/white-wine.xlsx")
 
 
 ```
