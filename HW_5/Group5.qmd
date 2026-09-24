@@ -56,7 +56,7 @@ Examples using the function:
 key <- "2c43d850c570494389b660ffaf1757db"
 
 querynews("Nashville International Airport", "2026-09-05", key)
-querynews("Miley Cyrus", "2026-08-20", key)
+querynews("Miley Cyrus", "2026-09-20", key)
 ```
 
 ### Task 2: Summarizing Roller Coaster Data
@@ -68,6 +68,7 @@ rollercoasters <- read_csv("http://www4.stat.ncsu.edu/online/datasets/635USrolle
 
 rollercoasters <- rollercoasters |>
   mutate(across(c(AgeGroup, Scale, `Census Region`, Type, Design, `Inversions?`), as.factor))
+
 ```
 
 Look at how the data is stored.
