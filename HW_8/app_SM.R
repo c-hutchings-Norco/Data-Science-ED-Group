@@ -23,11 +23,6 @@ ui <- fluidPage(
                   choices = numeric_vars,
                   selected = numeric_vars[1]
                   ),
-      "Put your selectize inputs here!",
-      "Give them internal IDs of corr_x and corr_y.",
-      "Note the vector with these names comes from the helpers.R files. The object is called `numeric_vars`. Make sure you don't assign the same initial value to both inputs!",
-      br(),
-      "Place your radio buttons here! One radio button for each variable we may subset on. Set the internal IDs for these to be hhl_corr, fs_corr, and schl_corr.",
       # Create data subsets (radio buttons)
       h2("Choose a subset of the data:"),
       radioButtons(inputId = "hhl_corr",
@@ -48,7 +43,6 @@ ui <- fluidPage(
                    choiceValues = c("all", "no_hs", "hs", "college"),
                    selected = "all"
                    ),
-      "Notice that you can use choiceNames and choiceValues to have different values show vs the values you use internally for comparisons. There are 'internal' values already used in the server file - the first large commented section - so you should set the internal values to match those!",
       # Create slider
       h2("Select a Sample Size"),
       sliderInput(inputId = "corr_n",
@@ -56,11 +50,10 @@ ui <- fluidPage(
                   min = 20,
                   max = 500,
                   value = 20),
-      "Put your slider for sample size here. Give this an ID of corr_n.",
       actionButton("corr_sample","Get a Sample!")
     ),
     mainPanel(
-      "Add a plotOutput here for the scatter plot!",
+      plotOutput(outputId = "plot"),
       conditionalPanel("input.corr_sample", #only show if a sample has been taken
                        h2("Guess the correlation!"),
                        column(6, 
