@@ -8,7 +8,7 @@ source("helpers.R")
 ui <- fluidPage(
   useShinyalert(),
 
-  "Correlation Exploration",
+  h2("Correlation Exploration"),
   sidebarLayout(
     sidebarPanel(
       h2("Select Variables to Find Correlation:"),
@@ -25,7 +25,7 @@ ui <- fluidPage(
         selected=numeric_vars[2]
       ),
       br(),
-      
+      h2("Choose a subset of the data:"),
       radioButtons(
         "hhl_corr",
         "Household Language",
