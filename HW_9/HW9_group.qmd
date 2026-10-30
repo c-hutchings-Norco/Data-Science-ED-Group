@@ -3,3 +3,53 @@ title: "HW9_group"
 format: html
 ---
 
+Reading in some tools!
+
+
+```{r}
+#| warnings: hold
+library(tidyverse)
+```
+This dataset keeps track of rented bikes / hour in Seoul, as well as a collection of climate and business metrics.
+
+By default, make.names() replaces weird characters (degrees, ^2, etc.)
+with periods, so the second line just removes those periods.
+```{r}
+bike <- read_csv("https://www4.stat.ncsu.edu/~online/datasets/SeoulBikeData.csv", 
+                 locale = locale(encoding = "latin1"))
+
+## By default, make.names() replaces weird characters (degrees, ^2, etc.)
+## with periods, so this line just removes those periods
+colnames(bike) <- gsub("\\.", "", make.names(colnames(bike)))
+
+bike <- bike|>
+  mutate(
+    Date = dmy(Date),
+    Seasons = as.factor(Seasons),
+    Holiday = as.factor(Holiday),
+    FunctioningDay = as.factor(FunctioningDay)
+  )
+```
+```{r}
+summary(bike)
+bike |>
+  summarize(across(everything(), ~sum(is.na(.))))
+```
+No `N/A` values? How nice :) And no values of -200 or anything like that either.
+
+Based on the summaries, it looks like our data is pretty evenly spread throughout the year - ~2200 measurements a month.
+
+Grouping the data by date - Step 7
+```{r}
+bike_daily <- bike |>
+  group_by(Date, Seasons, Holiday)|>
+  summarize(across(c(RentedBikeCount, Rainfallmm, Snowfallcm), sum),
+            across(c(TemperatureC:SolarRadiationMJm2), mean))          
+```
+
+quick plot by
+```{r}
+ggplot(bike_daily, aes(x = Date, y = RentedBikeCount, color = TemperatureC))+
+  geom_point()+
+  labs(title = "Rentals by date")
+```
