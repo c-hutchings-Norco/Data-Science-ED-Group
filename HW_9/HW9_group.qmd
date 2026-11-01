@@ -1,5 +1,5 @@
 ---
-title: "HW9_group"
+title: "HW9 Group"
 format: html
 ---
 
@@ -9,7 +9,10 @@ Reading in some tools!
 ```{r}
 #| warnings: hold
 library(tidyverse)
+library(tidymodels)
 ```
+### Reading Data and EDA
+
 This dataset keeps track of rented bikes / hour in Seoul, as well as a collection of climate and business metrics.
 
 By default, make.names() replaces weird characters (degrees, ^2, etc.)
@@ -33,11 +36,44 @@ bike <- bike|>
 ```{r}
 summary(bike)
 bike |>
-  summarize(across(everything(), ~sum(is.na(.))))
+  summarize(across(everything(), ~sum(is.na(.)))) |>
+  pivot_longer(everything())
 ```
 No `N/A` values? How nice :) And no values of -200 or anything like that either.
 
-Based on the summaries, it looks like our data is pretty evenly spread throughout the year - ~2200 measurements a month.
+Create summary statistics of numerical variables across categorical variables.
+
+```{r}
+mysummary <- function(data, variable){
+  summary <- data |>
+    group_by(get(variable)) |>
+    summarize(n = n(),
+              across(where(is.numeric),
+                     list("mean" = mean, "median" = median, "sd" = sd, "IQR" = IQR),
+                     .names = "{.fn}_{.col}"))
+  colnames(summary)[1] <- variable
+  return(summary)
+}
+
+mysummary(bike, "Seasons")
+mysummary(bike, "Holiday")
+mysummary(bike, "FunctioningDay")
+```
+
+When `FunctioningDay` is "No", `RentedBikeCount` is 0. Based on that, we will subset the data to exclude the non-functioning days.
+
+```{r}
+#filter to functioning days
+bike <- bike |>
+  filter(FunctioningDay == "Yes")
+
+#re-run the numerical summaries
+mysummary(bike, "Seasons")
+mysummary(bike, "Holiday")
+mysummary(bike, "FunctioningDay")
+```
+
+Based on the summaries, it looks like our data is pretty evenly spread throughout the year - ~2000 measurements a season.
 
 Grouping the data by date - Step 7
 ```{r}
@@ -47,9 +83,87 @@ bike_daily <- bike |>
             across(c(TemperatureC:SolarRadiationMJm2), mean))          
 ```
 
-quick plot by
+Recreate basic summary stats.
+
+```{r}
+summary(bike_daily)
+mysummary(bike_daily, "Seasons")
+mysummary(bike_daily, "Holiday")
+```
+
+create some plots to explore relationships.
+
+The plot below looks at bike rental counts and temperatures across dates.
+
 ```{r}
 ggplot(bike_daily, aes(x = Date, y = RentedBikeCount, color = TemperatureC))+
   geom_point()+
   labs(title = "Rentals by date")
 ```
+
+The plots below look at bike rental counts across seasons and whether it is a holiday.
+
+```{r}
+ggplot(bike_daily, aes(x = Seasons, y = RentedBikeCount, fill = Holiday)) +
+  geom_col() +
+  labs(title = "Rentals by Season")
+
+ggplot(bike_daily, aes(x = Seasons, y = RentedBikeCount, fill = Holiday)) +
+  geom_boxplot() +
+  labs(title = "Rentals by Season")
+```
+
+The plot below looks at the relationship between bike rentals and rainfall.
+
+```{r}
+ggplot(bike_daily, aes(x = Rainfallmm, y = RentedBikeCount, color = Seasons)) +
+  geom_point() +
+  geom_smooth(method = lm) +
+  labs(title = "Rentals by Rainfall")
+```
+
+All of the above plots support the idea that bike rentals are higher during the warmer seasons. Bike rentals also seem to be lower on holidays and lower when it is raining.
+
+We can quantify some of these patterns further by reporting correlation statistics.
+
+```{r}
+bike_daily |>
+  group_by(c()) |>
+  summarize(across(where(is.numeric),
+                   list("correlation" = ~ cor(.x, RentedBikeCount)),
+            .names = "cor_{.col}")) |>
+  pivot_longer(starts_with("cor_"))
+```
+
+### Split the Data
+
+Split the data into a training and testing set (75/25 split), stratified by Seasons.
+
+```{r}
+set.seed(10)
+bike_split <- rsample::initial_split(bike_daily, prop = 0.75, strata = Seasons)
+training <- training(bike_split)
+testing <- testing(bike_split)
+
+#view training set
+training
+
+#view testing set
+testing
+```
+
+### Fitting MLR Models
+
+Create Weekday/Weekend (factor) variable and standardize numeric variables.
+
+Now we can begin fitting models!
+
+Model 1:
+
+Model 2:
+
+Model 3:
+
+The model that minimizes the test set RMSE is ____. Fit that model to the entire data set to create the final fitted model.
+
+Report the coefficients of the final fitted model.
