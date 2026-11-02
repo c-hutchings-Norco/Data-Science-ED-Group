@@ -12,6 +12,7 @@ Load libraries needed.
 ```{r}
 library(tidyverse)
 library(tidymodels)
+library(lubridate)
 ```
 
 ### Load Data
@@ -21,10 +22,124 @@ bike <- read_csv("https://www4.stat.ncsu.edu/~online/datasets/SeoulBikeData.csv"
                  locale = locale(encoding = "latin1"))
 
 names(bike)
+
+str(bike$Date)
 ```
 
 ### EDA
 
 ```{r}
-View(bike)
+
+colnames(bike) <- gsub("\\.", "", make.names(colnames(bike)))
+
+
+bike <- bike|>
+  mutate(
+    Date = dmy(Date),
+    Seasons = as.factor(Seasons),
+    Holiday = as.factor(Holiday),
+    FunctioningDay = as.factor(FunctioningDay)
+  )
+
+
+```
+
+```{r}
+mysummary <- function(data, variable){
+  summary <- data |>
+    group_by(get(variable)) |>
+    summarize(n = n(),
+              across(where(is.numeric),
+                     list("mean" = mean, "median" = median, "sd" = sd, "IQR" = IQR),
+                     .names = "{.fn}_{.col}"))
+  colnames(summary)[1] <- variable
+  return(summary)
+}
+
+mysummary(bike, "Seasons")
+mysummary(bike, "Holiday")
+mysummary(bike, "FunctioningDay")
+
+bike <- bike |>
+  filter(FunctioningDay == "Yes")
+
+mysummary(bike, "Seasons")
+mysummary(bike, "Holiday")
+mysummary(bike, "FunctioningDay")
+
+bike_daily <- bike |>
+  group_by(Date, Seasons, Holiday)|>
+  summarize(across(c(RentedBikeCount, Rainfallmm, Snowfallcm), sum),
+            across(c(TemperatureC:SolarRadiationMJm2), mean))   
+
+summary(bike_daily)
+mysummary(bike_daily, "Seasons")
+mysummary(bike_daily, "Holiday")
+```
+
+#### Weekday/Weekend Variable
+
+```{r}
+bike_daily <- bike_daily |>
+  mutate(
+    DayOfWeek = wday(Date, label = TRUE, abbr = FALSE),
+    Weekend = if_else(
+      DayOfWeek %in% c("Saturday", "Sunday"),
+      "Weekend",
+      "Weekday"
+    )
+  )
+View(bike_daily)
+```
+
+#### Standardize the variables by calculating Z-scores
+
+```{r}
+set.seed(10)
+bike_split <- rsample::initial_split(bike_daily, prop = 0.75, strata = Seasons)
+training <- training(bike_split)
+testing <- testing(bike_split)
+
+
+# Standardized numeric variables for the test and training sets
+
+std_training <- training |>
+  ungroup() |>
+  mutate(
+    across(
+      where(is.numeric) & !all_of("RentedBikeCount"),
+      ~ (.x - mean(.x, na.rm = TRUE)) /
+        sd(.x, na.rm = TRUE)
+    )
+  )
+
+train_means <- training |>
+  ungroup() |> 
+  summarise(
+    across(
+      where(is.numeric) & !all_of("RentedBikeCount"),
+      ~ mean(.x, na.rm = TRUE)
+    )
+  )
+
+train_sds <- training |>
+  ungroup() |> 
+  summarise(
+    across(
+      where(is.numeric) & !all_of("RentedBikeCount"),
+      ~ sd(.x, na.rm = TRUE)
+    )
+  )
+
+std_testing <- testing |>
+  ungroup() |>
+  mutate(
+    across(
+      where(is.numeric) & !all_of("RentedBikeCount"),
+      ~ (.x - train_means[[cur_column()]]) /
+        train_sds[[cur_column()]]
+    )
+  )
+
+
 ```

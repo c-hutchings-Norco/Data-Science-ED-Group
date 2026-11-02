@@ -164,8 +164,6 @@ date_factor <- function(Date) {
   return(as.factor(weekend))
 }
 
-# Create a function to output standardized numeric variables
-
 # Modify training data set
 training <- training |>
   mutate(Weekend = date_factor(Date))
@@ -179,11 +177,57 @@ testing <- testing |>
 
 # View testing data set
 testing
+
+# Standardized numeric variables for the test and training sets
+
+std_training <- training |>
+  ungroup() |>
+  mutate(
+    across(
+      where(is.numeric) & !all_of("RentedBikeCount"),
+      ~ (.x - mean(.x, na.rm = TRUE)) /
+        sd(.x, na.rm = TRUE)
+    )
+  )
+
+train_means <- training |>
+  ungroup() |> 
+  summarise(
+    across(
+      where(is.numeric) & !all_of("RentedBikeCount"),
+      ~ mean(.x, na.rm = TRUE)
+    )
+  )
+
+train_sds <- training |>
+  ungroup() |> 
+  summarise(
+    across(
+      where(is.numeric) & !all_of("RentedBikeCount"),
+      ~ sd(.x, na.rm = TRUE)
+    )
+  )
+
+std_testing <- testing |>
+  ungroup() |>
+  mutate(
+    across(
+      where(is.numeric) & !all_of("RentedBikeCount"),
+      ~ (.x - train_means[[cur_column()]]) /
+          train_sds[[cur_column()]]
+    )
+  )
+
 ```
 
 
 
 Now we can begin fitting models!
+
+```{r}
+
+```
+
 
 Model 1:
 
