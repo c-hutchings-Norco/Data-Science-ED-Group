@@ -224,7 +224,7 @@ First model is to use the Rented Bike Count as our target variable and all other
 ```{r}
 #fit model with all variables
 names(std_training)
-all_var_fit <- lm(RentedBikeCount ~ .-Date-DayOfWeek, std_training)
+all_var_fit <- lm(RentedBikeCount ~ .-Date, std_training)
 
 summary(all_var_fit)
 #predict the y values for the x values in the test set
@@ -239,7 +239,7 @@ Second model is to use Rented Bike Count as our target variable and all the term
 ```{r}
 names(std_training)
 #fit the model with all the variables and the interaction terms
-interaction_var_fit <- lm(RentedBikeCount ~ . -Date -DayOfWeek +Seasons:Holiday +Seasons:TemperatureC+TemperatureC:Rainfallmm, std_training)
+interaction_var_fit <- lm(RentedBikeCount ~ . -Date +Seasons:Holiday +Seasons:TemperatureC+TemperatureC:Rainfallmm, std_training)
 
 #See the results of the model
 summary(interaction_var_fit)
@@ -255,7 +255,7 @@ rmse_inter <- rmse_vec(
 Third model is to use Rented Bike Count as our target variable and all the terms in the first model plus the interaction terms in the second model and include quadratic terms of temperature and humidity squared (all standardized variables used here).
 ```{r}
 #fit the model with all the variables, the interaction terms, and the quadratic terms
-quad_var_fit <- lm(RentedBikeCount ~ . -Date -DayOfWeek +Seasons:Holiday +Seasons:TemperatureC+TemperatureC:Rainfallmm + I(TemperatureC^2) +I(Humidity^2), data = std_training)
+quad_var_fit <- lm(RentedBikeCount ~ . -Date +Seasons:Holiday +Seasons:TemperatureC+TemperatureC:Rainfallmm + I(TemperatureC^2) +I(Humidity^2), data = std_training)
 
 #See the results of the model
 summary(quad_var_fit)
@@ -299,7 +299,7 @@ std_bike_daily <- bike_daily |>
 
 
 #fit the model with all the variables and the interaction terms and all data
-interaction_var_fit_full <- lm(RentedBikeCount ~ . -Date -DayOfWeek +Seasons:Holiday +Seasons:TemperatureC+TemperatureC:Rainfallmm, std_bike_daily)
+interaction_var_fit_full <- lm(RentedBikeCount ~ . -Date +Seasons:Holiday +Seasons:TemperatureC+TemperatureC:Rainfallmm, std_bike_daily)
 
 #See the results of the model
 summary(interaction_var_fit_full)
