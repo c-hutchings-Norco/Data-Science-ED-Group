@@ -155,6 +155,33 @@ testing
 ### Fitting MLR Models
 
 Create Weekday/Weekend (factor) variable and standardize numeric variables.
+```{r}
+# Create a function to output weekday or weekend as a factor variable
+date_factor <- function(Date) {
+  wend_wday <- wday(Date,
+       label = TRUE)
+  weekend <- ifelse(wend_wday %in% c("Sat", "Sun"), "Weekend", "Weekday")
+  return(as.factor(weekend))
+}
+
+# Create a function to output standardized numeric variables
+
+# Modify training data set
+training <- training |>
+  mutate(Weekend = date_factor(Date))
+
+# View training data set
+training
+
+# Modify testing data set |>
+testing <- testing |>
+  mutate(Weekend = date_factor(Date))
+
+# View testing data set
+testing
+```
+
+
 
 Now we can begin fitting models!
 
