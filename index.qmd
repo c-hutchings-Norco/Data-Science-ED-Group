@@ -12,3 +12,4 @@ Links to homework below:
 - [Homework 3](HW_3/HW3_Group.qmd)
 - [Homework 4](HW_4/HW4_Group.qmd)
 - [Homework 5](HW_5/Group5.qmd)
+- [Homework 9](HW_9/HW9_group.qmd)
