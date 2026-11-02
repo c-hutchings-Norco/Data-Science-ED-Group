@@ -1,0 +1,30 @@
+---
+title: "Homework 9"
+author: "Caroline Hutchings"
+format: html
+editor: visual
+---
+
+## Homework 9
+
+Load libraries needed.
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+```
+
+### Load Data
+
+```{r}
+bike <- read_csv("https://www4.stat.ncsu.edu/~online/datasets/SeoulBikeData.csv", 
+                 locale = locale(encoding = "latin1"))
+
+names(bike)
+```
+
+### EDA
+
+```{r}
+View(bike)
+```
