@@ -183,8 +183,7 @@ testing
 std_training <- training |>
   ungroup() |>
   mutate(
-    across(
-      where(is.numeric) & !all_of("RentedBikeCount"),
+    across(where(is.numeric) & !all_of("RentedBikeCount"),
       ~ (.x - mean(.x, na.rm = TRUE)) /
         sd(.x, na.rm = TRUE)
     )
@@ -193,8 +192,7 @@ std_training <- training |>
 train_means <- training |>
   ungroup() |> 
   summarise(
-    across(
-      where(is.numeric) & !all_of("RentedBikeCount"),
+    across(where(is.numeric) & !all_of("RentedBikeCount"),
       ~ mean(.x, na.rm = TRUE)
     )
   )
@@ -202,8 +200,7 @@ train_means <- training |>
 train_sds <- training |>
   ungroup() |> 
   summarise(
-    across(
-      where(is.numeric) & !all_of("RentedBikeCount"),
+    across(where(is.numeric) & !all_of("RentedBikeCount"),
       ~ sd(.x, na.rm = TRUE)
     )
   )
@@ -211,8 +208,7 @@ train_sds <- training |>
 std_testing <- testing |>
   ungroup() |>
   mutate(
-    across(
-      where(is.numeric) & !all_of("RentedBikeCount"),
+    across(where(is.numeric) & !all_of("RentedBikeCount"),
       ~ (.x - train_means[[cur_column()]]) /
           train_sds[[cur_column()]]
     )
@@ -222,19 +218,108 @@ std_testing <- testing |>
 
 
 
-Now we can begin fitting models!
+#### Fitting Models
+First model is to use the Rented Bike Count as our target variable and all other variables as our features.  Use RMSE as the metric to evaluate the fit of the model using the training data.
 
 ```{r}
+#fit model with all variables
+names(std_training)
+all_var_fit <- lm(RentedBikeCount ~ .-Date-DayOfWeek, std_training)
+
+summary(all_var_fit)
+#predict the y values for the x values in the test set
+Y_test <- predict(all_var_fit, newdata = std_testing)
+
+#Calculate the RMSE for the test set
+rmse_var <- rmse_vec(
+  truth = std_testing$RentedBikeCount,
+  estimate = Y_test)
+```
+Second model is to use Rented Bike Count as our target variable and all the terms in the first model but also interactions between seasons and holiday, seasons and temp, and temp and rainfall (all standardized variables used here).
+```{r}
+names(std_training)
+#fit the model with all the variables and the interaction terms
+interaction_var_fit <- lm(RentedBikeCount ~ . -Date -DayOfWeek +Seasons:Holiday +Seasons:TemperatureC+TemperatureC:Rainfallmm, std_training)
+
+#See the results of the model
+summary(interaction_var_fit)
+
+#predict the y values for the x values in the test set
+Y_test_inter <- predict(interaction_var_fit, newdata = std_testing)
+
+#Calculate the RMSE for the test set
+rmse_inter <- rmse_vec(
+  truth = std_testing$RentedBikeCount,
+  estimate = Y_test_inter)
+```
+Third model is to use Rented Bike Count as our target variable and all the terms in the first model plus the interaction terms in the second model and include quadratic terms of temperature and humidity squared (all standardized variables used here).
+```{r}
+#fit the model with all the variables, the interaction terms, and the quadratic terms
+quad_var_fit <- lm(RentedBikeCount ~ . -Date -DayOfWeek +Seasons:Holiday +Seasons:TemperatureC+TemperatureC:Rainfallmm + I(TemperatureC^2) +I(Humidity^2), data = std_training)
+
+#See the results of the model
+summary(quad_var_fit)
+
+#predict the y values for the x values in the test set
+Y_test_quad <- predict(quad_var_fit, newdata=std_testing)
+
+
+#Calculate the RMSE for the test set
+rmse_quad <- rmse_vec(
+  truth = std_testing$RentedBikeCount,
+  estimate = Y_test_quad)
+
+c(Main_Effects = rmse_var,
+  Interactions = rmse_inter,
+  Quadratic = rmse_quad)
 
 ```
 
 
-Model 1:
+Model 1: The RMSE for all variables is 3530.921
 
-Model 2:
+Model 2: The RMSE for all variables plus the interaction terms is 3128.248
 
-Model 3:
+Model 3: The RMSE for all variables, interaction terms, and quadratic terms is 3133.055
 
-The model that minimizes the test set RMSE is ____. Fit that model to the entire data set to create the final fitted model.
+The model that minimizes the test set RMSE is Model 2 which includes all the variables and the interaction terms. 
 
-Report the coefficients of the final fitted model.
+Fit that model to the entire data set to create the final fitted model.
+
+```{r}
+#Standardize the variables with all the data
+std_bike_daily <- bike_daily |>
+  ungroup() |>
+  mutate(
+    across(where(is.numeric) & !all_of("RentedBikeCount"),
+      ~ (.x - mean(.x, na.rm = TRUE)) /
+        sd(.x, na.rm = TRUE)
+    )
+  )
+
+
+#fit the model with all the variables and the interaction terms and all data
+interaction_var_fit_full <- lm(RentedBikeCount ~ . -Date -DayOfWeek +Seasons:Holiday +Seasons:TemperatureC+TemperatureC:Rainfallmm, std_bike_daily)
+
+#See the results of the model
+summary(interaction_var_fit_full)
+
+#predict the y values for the x values in the test set
+Y_test_inter_full <- predict(interaction_var_fit_full, newdata = std_bike_daily)
+
+#Calculate the RMSE for the test set
+rmse_inter_full <- rmse_vec(
+  truth = std_bike_daily$RentedBikeCount,
+  estimate = Y_test_inter_full)
+rmse_inter
+
+#Report the coefficients of the final fitted model
+coefficients_full <- data.frame(
+  Term = names(coef(interaction_var_fit_full)),
+  Coefficient = coef(interaction_var_fit_full)
+)
+
+coefficients_full
+```
+
+
