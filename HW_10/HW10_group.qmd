@@ -155,7 +155,7 @@ training
 testing
 
 #create folds for cross-validation split
-folds <- vfold_cv(training, 10, strata = Seasons)
+bike_CV_folds <- vfold_cv(training, 10, strata = Seasons)
 ```
 
 ### Fitting MLR Models
@@ -167,17 +167,16 @@ folds <- vfold_cv(training, 10, strata = Seasons)
 - Create dummy variables for the seasons, holiday, and our new day type variable
 
 ```{r}
-recipe1 <- recipe(RentedBikeCount ~ ., data = training) |> 
+MLR_recipe1 <- recipe(RentedBikeCount ~ ., data = training) |> 
   update_role(Date, new_role = "ID") |>
   step_date(Date, features = "dow") |>
   step_mutate(weekend = factor(if_else(Date_dow %in% c("Sat", "Sun"), "Weekend", "Weekday"))) |>
   step_select(-Date_dow) |>
   step_normalize(all_numeric_predictors()) |>
-  step_dummy(all_nominal_predictors()) |>
-  prep()
+  step_dummy(all_nominal_predictors())
 
 #view summary of recipe
-summary(recipe1)
+summary(MLR_recipe1)
 ```
 
 #### Recipe 2
@@ -185,7 +184,7 @@ summary(recipe1)
 - Add in interactions between seasons and holiday, seasons and temp, temp and rainfall
 
 ```{r}
-recipe2 <- recipe(RentedBikeCount ~ ., data = training) |> 
+MLR_recipe2 <- recipe(RentedBikeCount ~ ., data = training) |> 
   update_role(Date, new_role = "ID") |>
   step_date(Date, features = "dow") |>
   step_mutate(weekend = factor(if_else(Date_dow %in% c("Sat", "Sun"), "Weekend", "Weekday"))) |>
@@ -194,11 +193,10 @@ recipe2 <- recipe(RentedBikeCount ~ ., data = training) |>
   step_dummy(all_nominal_predictors()) |>
   step_interact(~ starts_with("Seasons"):starts_with("Holiday") +
                   starts_with("Seasons"):TemperatureC +
-                  TemperatureC:Rainfallmm) |>
-  prep()
+                  TemperatureC:Rainfallmm)
 
 #view summary of recipe
-summary(recipe2)
+summary(MLR_recipe2)
 ```
 
 #### Recipe 3
@@ -206,7 +204,7 @@ summary(recipe2)
 - Add in quadratic terms for the standardized temp and humidity variables
 
 ```{r}
-recipe3 <- recipe(RentedBikeCount ~ ., data = training) |> 
+MLR_recipe3 <- recipe(RentedBikeCount ~ ., data = training) |> 
   update_role(Date, new_role = "ID") |>
   step_date(Date, features = "dow") |>
   step_mutate(weekend = factor(if_else(Date_dow %in% c("Sat", "Sun"), "Weekend", "Weekday"))) |>
@@ -217,20 +215,73 @@ recipe3 <- recipe(RentedBikeCount ~ ., data = training) |>
                   starts_with("Seasons"):TemperatureC +
                   TemperatureC:Rainfallmm) |>
   step_mutate(TemperatureC_2 = TemperatureC^2,
-         Humidity_2 = Humidity^2) |>
-  prep()
+         Humidity_2 = Humidity^2)
 
 #view summary of recipe
-summary(recipe3)
+summary(MLR_recipe3)
 ```
 
 #### Compare MLR Models
 
-```{r}
+Set up linear models to use the "lm" engine.
 
+```{r}
+MLR_spec <- linear_reg() |>
+  set_engine("lm")
+```
+
+Create workflows.
+
+```{r}
+MLR_wkf1 <- workflow() |>
+  add_recipe(MLR_recipe1) |>
+  add_model(MLR_spec)
+
+MLR_wkf2 <- workflow() |>
+  add_recipe(MLR_recipe2) |>
+  add_model(MLR_spec)
+
+MLR_wkf3 <- workflow() |>
+  add_recipe(MLR_recipe3) |>
+  add_model(MLR_spec)
+```
+
+Fit the models using 10 fold CV and consider the training set CV error to choose a best model.
+
+```{r}
+MLR_fit1 <-  MLR_wkf1 |>
+  fit_resamples(bike_CV_folds)
+
+MLR_fit2 <- MLR_wkf2 |>
+  fit_resamples(bike_CV_folds) 
+
+MLR_fit3 <- MLR_wkf3 |>
+  fit_resamples(bike_CV_folds)
+```
+
+Collect metrics.
+
+```{r}
+rbind(MLR_fit1 |> collect_metrics() |> filter(.metric == "rmse"),
+      MLR_fit2 |> collect_metrics() |> filter(.metric == "rmse"),
+      MLR_fit3 |> collect_metrics() |> filter(.metric == "rmse")) |> 
+  mutate(Model = c("Model 1", "Model 2", "Model 3")) |>
+  select(Model, mean, n, std_err)
+```
+
+The best model based on the cross-validation RMSE metrics is Model 3.
+
+Fit the model to the entire training data set.
+
+```{r}
+MLR_wkf3 |>
+  last_fit(bike_split) |>
+  collect_metrics()
 ```
 
 ### Fitting Other Models
+
+Using the first recipe from the MLR section, fit other types of models:
 
 #### Regression Tree
 
