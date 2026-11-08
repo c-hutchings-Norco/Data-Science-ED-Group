@@ -5,18 +5,18 @@ format: html
 
 Reading in some tools!
 
-
 ```{r}
 #| warnings: hold
 library(tidyverse)
 library(tidymodels)
 ```
+
 ### Reading Data and EDA
 
 This dataset keeps track of rented bikes / hour in Seoul, as well as a collection of climate and business metrics.
 
-By default, make.names() replaces weird characters (degrees, ^2, etc.)
-with periods, so the second line just removes those periods.
+By default, make.names() replaces weird characters (degrees, \^2, etc.) with periods, so the second line just removes those periods.
+
 ```{r}
 bike <- read_csv("https://www4.stat.ncsu.edu/~online/datasets/SeoulBikeData.csv", 
                  locale = locale(encoding = "latin1"))
@@ -33,12 +33,14 @@ bike <- bike|>
     FunctioningDay = as.factor(FunctioningDay)
   )
 ```
+
 ```{r}
 summary(bike)
 bike |>
   summarize(across(everything(), ~sum(is.na(.)))) |>
   pivot_longer(everything())
 ```
+
 No `N/A` values? How nice :) And no values of -200 or anything like that either.
 
 Create summary statistics of numerical variables across categorical variables.
@@ -73,9 +75,10 @@ mysummary(bike, "Holiday")
 mysummary(bike, "FunctioningDay")
 ```
 
-Based on the summaries, it looks like our data is pretty evenly spread throughout the year - ~2000 measurements a season.
+Based on the summaries, it looks like our data is pretty evenly spread throughout the year - \~2000 measurements a season.
 
 Grouping the data by date - Step 7
+
 ```{r}
 bike_daily <- bike |>
   group_by(Date, Seasons, Holiday)|>
@@ -137,7 +140,7 @@ bike_daily |>
 
 ### Split the Data
 
-Split the data into a training and testing set (75/25 split), stratified by Seasons.
+Split the data into a training and testing set (75/25 split), stratified by Seasons. On the training set, create a 10-fold CV split.
 
 ```{r}
 set.seed(10)
@@ -150,176 +153,89 @@ training
 
 #view testing set
 testing
+
+#create folds for cross-validation split
+folds <- vfold_cv(training, 10, strata = Seasons)
 ```
 
 ### Fitting MLR Models
 
-Create Weekday/Weekend (factor) variable and standardize numeric variables.
+#### Recipe 1
+
+- Ignore the date variable for modeling but use it to create a weekday/weekend (factor) variable
+- Standardize the numeric variables
+- Create dummy variables for the seasons, holiday, and our new day type variable
+
 ```{r}
-# Create a function to output weekday or weekend as a factor variable
-date_factor <- function(Date) {
-  wend_wday <- wday(Date,
-       label = TRUE)
-  weekend <- ifelse(wend_wday %in% c("Sat", "Sun"), "Weekend", "Weekday")
-  return(as.factor(weekend))
-}
+recipe1 <- recipe(RentedBikeCount ~ ., data = training) |> 
+  update_role(Date, new_role = "ID") |>
+  step_date(Date, features = "dow") |>
+  step_mutate(weekend = factor(if_else(Date_dow %in% c("Sat", "Sun"), "Weekend", "Weekday"))) |>
+  step_select(-Date_dow) |>
+  step_normalize(all_numeric_predictors()) |>
+  step_dummy(all_nominal_predictors()) |>
+  prep()
 
-# Modify training data set
-training <- training |>
-  mutate(Weekend = date_factor(Date))
+#view summary of recipe
+summary(recipe1)
+```
 
-# View training data set
-training
+#### Recipe 2
 
-# Modify testing data set |>
-testing <- testing |>
-  mutate(Weekend = date_factor(Date))
+- Add in interactions between seasons and holiday, seasons and temp, temp and rainfall
 
-# View testing data set
-testing
+```{r}
+recipe2 <- recipe(RentedBikeCount ~ ., data = training) |> 
+  update_role(Date, new_role = "ID") |>
+  step_date(Date, features = "dow") |>
+  step_mutate(weekend = factor(if_else(Date_dow %in% c("Sat", "Sun"), "Weekend", "Weekday"))) |>
+  step_select(-Date_dow) |>
+  step_normalize(all_numeric_predictors()) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_interact(~ starts_with("Seasons"):starts_with("Holiday") +
+                  starts_with("Seasons"):TemperatureC +
+                  TemperatureC:Rainfallmm) |>
+  prep()
 
-# Standardized numeric variables for the test and training sets
+#view summary of recipe
+summary(recipe2)
+```
 
-std_training <- training |>
-  ungroup() |>
-  mutate(
-    across(where(is.numeric) & !all_of("RentedBikeCount"),
-      ~ (.x - mean(.x, na.rm = TRUE)) /
-        sd(.x, na.rm = TRUE)
-    )
-  )
+#### Recipe 3
 
-train_means <- training |>
-  ungroup() |> 
-  summarise(
-    across(where(is.numeric) & !all_of("RentedBikeCount"),
-      ~ mean(.x, na.rm = TRUE)
-    )
-  )
+- Add in quadratic terms for the standardized temp and humidity variables
 
-train_sds <- training |>
-  ungroup() |> 
-  summarise(
-    across(where(is.numeric) & !all_of("RentedBikeCount"),
-      ~ sd(.x, na.rm = TRUE)
-    )
-  )
+```{r}
+recipe3 <- recipe(RentedBikeCount ~ ., data = training) |> 
+  update_role(Date, new_role = "ID") |>
+  step_date(Date, features = "dow") |>
+  step_mutate(weekend = factor(if_else(Date_dow %in% c("Sat", "Sun"), "Weekend", "Weekday"))) |>
+  step_select(-Date_dow) |>
+  step_normalize(all_numeric_predictors()) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_interact(~ starts_with("Seasons"):starts_with("Holiday") +
+                  starts_with("Seasons"):TemperatureC +
+                  TemperatureC:Rainfallmm) |>
+  step_mutate(TemperatureC_2 = TemperatureC^2,
+         Humidity_2 = Humidity^2) |>
+  prep()
 
-std_testing <- testing |>
-  ungroup() |>
-  mutate(
-    across(where(is.numeric) & !all_of("RentedBikeCount"),
-      ~ (.x - train_means[[cur_column()]]) /
-          train_sds[[cur_column()]]
-    )
-  )
+#view summary of recipe
+summary(recipe3)
+```
+
+#### Compare MLR Models
+
+```{r}
 
 ```
 
+### Fitting Other Models
 
+#### Regression Tree
 
-#### Fitting Models
-First model is to use the Rented Bike Count as our target variable and all other variables as our features.  Use RMSE as the metric to evaluate the fit of the model using the training data.
+#### Bagged Tree
 
-```{r}
-#fit model with all variables
-names(std_training)
-all_var_fit <- lm(RentedBikeCount ~ .-Date, std_training)
+#### Random Forest
 
-summary(all_var_fit)
-#predict the y values for the x values in the test set
-Y_test <- predict(all_var_fit, newdata = std_testing)
-
-#Calculate the RMSE for the test set
-rmse_var <- rmse_vec(
-  truth = std_testing$RentedBikeCount,
-  estimate = Y_test)
-```
-Second model is to use Rented Bike Count as our target variable and all the terms in the first model but also interactions between seasons and holiday, seasons and temp, and temp and rainfall (all standardized variables used here).
-```{r}
-names(std_training)
-#fit the model with all the variables and the interaction terms
-interaction_var_fit <- lm(RentedBikeCount ~ . -Date +Seasons:Holiday +Seasons:TemperatureC+TemperatureC:Rainfallmm, std_training)
-
-#See the results of the model
-summary(interaction_var_fit)
-
-#predict the y values for the x values in the test set
-Y_test_inter <- predict(interaction_var_fit, newdata = std_testing)
-
-#Calculate the RMSE for the test set
-rmse_inter <- rmse_vec(
-  truth = std_testing$RentedBikeCount,
-  estimate = Y_test_inter)
-```
-Third model is to use Rented Bike Count as our target variable and all the terms in the first model plus the interaction terms in the second model and include quadratic terms of temperature and humidity squared (all standardized variables used here).
-```{r}
-#fit the model with all the variables, the interaction terms, and the quadratic terms
-quad_var_fit <- lm(RentedBikeCount ~ . -Date +Seasons:Holiday +Seasons:TemperatureC+TemperatureC:Rainfallmm + I(TemperatureC^2) +I(Humidity^2), data = std_training)
-
-#See the results of the model
-summary(quad_var_fit)
-
-#predict the y values for the x values in the test set
-Y_test_quad <- predict(quad_var_fit, newdata=std_testing)
-
-
-#Calculate the RMSE for the test set
-rmse_quad <- rmse_vec(
-  truth = std_testing$RentedBikeCount,
-  estimate = Y_test_quad)
-
-c(Main_Effects = rmse_var,
-  Interactions = rmse_inter,
-  Quadratic = rmse_quad)
-
-```
-
-
-Model 1: The RMSE for all variables is 3530.921
-
-Model 2: The RMSE for all variables plus the interaction terms is 3128.248
-
-Model 3: The RMSE for all variables, interaction terms, and quadratic terms is 3133.055
-
-The model that minimizes the test set RMSE is Model 2 which includes all the variables and the interaction terms. 
-
-Fit that model to the entire data set to create the final fitted model.
-
-```{r}
-#Standardize the variables with all the data
-std_bike_daily <- bike_daily |>
-  ungroup() |>
-  mutate(
-    across(where(is.numeric) & !all_of("RentedBikeCount"),
-      ~ (.x - mean(.x, na.rm = TRUE)) /
-        sd(.x, na.rm = TRUE)
-    )
-  )
-
-
-#fit the model with all the variables and the interaction terms and all data
-interaction_var_fit_full <- lm(RentedBikeCount ~ . -Date +Seasons:Holiday +Seasons:TemperatureC+TemperatureC:Rainfallmm, std_bike_daily)
-
-#See the results of the model
-summary(interaction_var_fit_full)
-
-#predict the y values for the x values in the test set
-Y_test_inter_full <- predict(interaction_var_fit_full, newdata = std_bike_daily)
-
-#Calculate the RMSE for the test set
-rmse_inter_full <- rmse_vec(
-  truth = std_bike_daily$RentedBikeCount,
-  estimate = Y_test_inter_full)
-rmse_inter
-
-#Report the coefficients of the final fitted model
-coefficients_full <- data.frame(
-  Term = names(coef(interaction_var_fit_full)),
-  Coefficient = coef(interaction_var_fit_full)
-)
-
-coefficients_full
-```
-
-
+### Compare on the test sets
