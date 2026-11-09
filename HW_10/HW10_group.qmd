@@ -179,6 +179,12 @@ MLR_recipe1 <- recipe(RentedBikeCount ~ ., data = training) |>
 
 #view summary of recipe
 summary(MLR_recipe1)
+
+#view columns
+MLR_recipe1 |>
+  prep(training) |>
+  bake(training) |>
+  colnames()
 ```
 
 #### Recipe 2
@@ -199,6 +205,12 @@ MLR_recipe2 <- recipe(RentedBikeCount ~ ., data = training) |>
 
 #view summary of recipe
 summary(MLR_recipe2)
+
+#view columns
+MLR_recipe2 |>
+  prep(training) |>
+  bake(training) |>
+  colnames()
 ```
 
 #### Recipe 3
@@ -221,6 +233,12 @@ MLR_recipe3 <- recipe(RentedBikeCount ~ ., data = training) |>
 
 #view summary of recipe
 summary(MLR_recipe3)
+
+#view columns
+MLR_recipe3 |>
+  prep(training) |>
+  bake(training) |>
+  colnames()
 ```
 
 #### Compare MLR Models
