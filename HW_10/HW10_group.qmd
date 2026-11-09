@@ -294,9 +294,10 @@ The best model based on the cross-validation RMSE metrics is Model 3.
 Fit the model to the entire training data set.
 
 ```{r}
-MLR_wkf3 |>
+MLR_final_fit <- MLR_wkf3 |>
   last_fit(bike_split) |>
   collect_metrics()
+
 ```
 
 ### Fitting Other Models
@@ -442,3 +443,43 @@ rand_forest_final_model <- extract_workflow(rand_forest_final_fit)
 ```
 
 ### Compare on the test sets
+
+First, the best models from each family of models are used to predict test data set values
+```{r}
+# MLR model predictions
+#predict(MLR_fit3, new_data = testing)
+# Regression Tree model predictions
+# Bagged tree model predictions
+# Random forest model predictions
+
+predict(rand_forest_final_model, new_data = testing$RentedBikeCount)
+```
+
+Now that we've use each model to predict on the test set values, here is a summary report for each model.
+```{r}
+# MLR final model fit
+
+# regression tree final model fit
+reg_tree_final_model |>
+  extract_fit_engine() |>
+  rpart.plot::rpart.plot(roundint = FALSE)
+
+# bagged tree final model fit
+bag_final_model <- extract_fit_engine(bag_tree_final_fit)
+bag_final_model$imp |>
+  mutate(term = factor(term, levels = term)) |>
+  ggplot(aes(x = term, y = value)) +
+  geom_bar(stat = "identity") +
+  coord_flip()
+
+# random forest final model fit
+
+```
+
+The best model is now fit with the overall data
+```{r}
+final_model <-
+  fit(bike_split)
+tidy(final_model)
+```
+
