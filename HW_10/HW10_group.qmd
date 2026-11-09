@@ -10,6 +10,7 @@ Reading in some tools!
 library(tidyverse)
 library(tidymodels)
 library(rpart.plot)
+library(baguette)
 ```
 
 ### Reading Data and EDA
@@ -288,6 +289,7 @@ In general, this will follow these steps:
 Recipe > Model > Workflow > Fit & Tune Tree > Select best model > Fit to entire training set
 
 #### Regression Tree
+
 ```{r}
 ## Define Model
 reg_tree_mod <- decision_tree(tree_depth = tune(),
@@ -332,8 +334,93 @@ reg_tree_final_fit |> collect_metrics()
 
 reg_tree_final_model <- extract_workflow(reg_tree_final_fit) 
 ```
+
 #### Bagged Tree
 
+```{r}
+## Define Model
+bag_tree_mod <- bag_tree(tree_depth = tune(),
+                          min_n = 20,
+                          cost_complexity = tune())|>
+  set_engine("rpart")|>
+  set_mode("regression")
+
+## Add model & recipe to workflow
+bag_tree_wkf <- workflow()|>
+  add_recipe(MLR_recipe1)|>
+  add_model(bag_tree_mod)
+
+bag_tree_grid <- grid_regular(cost_complexity(),
+                          tree_depth(),
+                          levels = c(10, 5))
+
+## Fit & tune tree
+bag_tree_fits <- bag_tree_wkf |> 
+  tune_grid(resamples = bike_CV_folds,
+            grid = bag_tree_grid)
+```
+
+```{r}
+#| results: hold
+## Select best model
+bag_tree_best <- select_best(bag_tree_fits, metric = "rmse")
+cat("=== Best Bagged Tree Parameters ===")
+bag_tree_best
+```
+
+Now, fit to entire training set
+
+```{r}
+bag_tree_final_wkf <- bag_tree_wkf |>
+  finalize_workflow(bag_tree_best)
+
+bag_tree_final_fit <- bag_tree_final_wkf |>
+  last_fit(bike_split)
+
+bag_tree_final_fit |> collect_metrics()
+
+bag_tree_final_model <- extract_workflow(bag_tree_final_fit) 
+```
+
 #### Random Forest
+
+```{r}
+## Define Model
+rand_forest_mod <- rand_forest(mtry = tune())|>
+  set_engine("ranger")|>
+  set_mode("regression")
+
+## Add model & recipe to workflow
+rand_forest_wkf <- workflow()|>
+  add_recipe(MLR_recipe1)|>
+  add_model(rand_forest_mod)
+
+## Fit & tune tree
+rand_forest_fits <- rand_forest_wkf |> 
+  tune_grid(resamples = bike_CV_folds,
+            grid = 10)
+```
+
+```{r}
+#| results: hold
+## Select best model
+rand_forest_best <- select_best(rand_forest_fits, metric = "rmse")
+cat("=== Best Random Forest Parameters ===")
+rand_forest_best
+```
+
+Now, fit to entire training set
+
+```{r}
+rand_forest_final_wkf <- rand_forest_wkf |>
+  finalize_workflow(rand_forest_best)
+
+rand_forest_final_fit <- rand_forest_final_wkf |>
+  last_fit(bike_split)
+
+rand_forest_final_fit |> collect_metrics()
+
+rand_forest_final_model <- extract_workflow(rand_forest_final_fit) 
+```
 
 ### Compare on the test sets
