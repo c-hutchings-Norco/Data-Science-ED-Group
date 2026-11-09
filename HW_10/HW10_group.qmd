@@ -9,6 +9,7 @@ Reading in some tools!
 #| warnings: hold
 library(tidyverse)
 library(tidymodels)
+library(rpart.plot)
 ```
 
 ### Reading Data and EDA
@@ -283,8 +284,54 @@ MLR_wkf3 |>
 
 Using the first recipe from the MLR section, fit other types of models:
 
-#### Regression Tree
+In general, this will follow these steps:
+Recipe > Model > Workflow > Fit & Tune Tree > Select best model > Fit to entire training set
 
+#### Regression Tree
+```{r}
+## Define Model
+reg_tree_mod <- decision_tree(tree_depth = tune(),
+                          min_n = 20,
+                          cost_complexity = tune())|>
+  set_engine("rpart")|>
+  set_mode("regression")
+
+## Add model & recipe to workflow
+reg_tree_wkf <- workflow()|>
+  add_recipe(MLR_recipe1)|>
+  add_model(reg_tree_mod)
+
+reg_tree_grid <- grid_regular(cost_complexity(),
+                          tree_depth(),
+                          levels = c(10, 5))
+
+## Fit & tune tree
+reg_tree_fits <- reg_tree_wkf |> 
+  tune_grid(resamples = bike_CV_folds,
+            grid = reg_tree_grid)
+```
+
+```{r}
+#| results: hold
+## Select best model
+reg_tree_best <- select_best(reg_tree_fits, metric = "rmse")
+cat("=== Best Regression Tree Parameters ===")
+reg_tree_best
+```
+
+Now, fit to entire training set
+
+```{r}
+reg_tree_final_wkf <- reg_tree_wkf |>
+  finalize_workflow(reg_tree_best)
+
+reg_tree_final_fit <- reg_tree_final_wkf |>
+  last_fit(bike_split)
+
+reg_tree_final_fit |> collect_metrics()
+
+reg_tree_final_model <- extract_workflow(reg_tree_final_fit) 
+```
 #### Bagged Tree
 
 #### Random Forest
