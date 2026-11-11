@@ -446,16 +446,17 @@ rand_forest_final_model <- extract_workflow(rand_forest_final_fit)
 First, the best models from each family of models are used to predict test data set values
 ```{r}
 # MLR model predictions
-#predict(MLR_fit3, new_data = testing)
 # Regression Tree model predictions
 # Bagged tree model predictions
 # Random forest model predictions
 
-rf_preds <- collect_predictions(rand_forest_final_fit)
+mlr_preds <- collect_predictions(MLR_final_fit)
 
 reg_preds <- collect_predictions(reg_tree_final_fit)
 
 bag_preds <- collect_predictions(bag_tree_final_fit)
+
+rf_preds <- collect_predictions(rand_forest_final_fit)
 
 
 ```
@@ -465,41 +466,39 @@ Now that we've use each model to predict on the test set values, here is a summa
 # MLR final model fit
 MLR_final_fit <- MLR_wkf3 |>
   last_fit(bike_split)
+collect_metrics(MLR_final_fit)
 
+# regression tree final model fit
 reg_tree_final_fit <- reg_tree_final_wkf |>
   last_fit(bike_split)
-
-bag_tree_final_fit <- bag_tree_final_wkf |>
-  last_fit(bike_split)
-
-rand_forest_final_fit <- rand_forest_final_wkf |>
-  last_fit(bike_split)
-
-collect_metrics(MLR_final_fit)
 collect_metrics(reg_tree_final_fit)
-collect_metrics(bag_tree_final_fit)
-collect_metrics(rand_forest_final_fit)
-# regression tree final model fit
-reg_tree_final_model |>
-  extract_fit_engine() |>
-  rpart.plot::rpart.plot(roundint = FALSE)
 
 # bagged tree final model fit
-bag_final_model <- extract_fit_engine(bag_tree_final_fit)
-bag_final_model$imp |>
-  mutate(term = factor(term, levels = term)) |>
-  ggplot(aes(x = term, y = value)) +
-  geom_bar(stat = "identity") +
-  coord_flip()
+bag_tree_final_fit <- bag_tree_final_wkf |>
+  last_fit(bike_split)
+collect_metrics(bag_tree_final_fit)
 
 # random forest final model fit
+rand_forest_final_fit <- rand_forest_final_wkf |>
+  last_fit(bike_split)
+collect_metrics(rand_forest_final_fit)
 
+
+bind_rows(
+  collect_metrics(MLR_final_fit) |> mutate(Model = "MLR"),
+  collect_metrics(reg_tree_final_fit) |> mutate(Model = "Regression Tree"),
+  collect_metrics(bag_tree_final_fit) |> mutate(Model = "Bagged Tree"),
+  collect_metrics(rand_forest_final_fit) |> mutate(Model = "Random Forest")
+)
 ```
 
 The best model is now fit with the overall data
 ```{r}
-final_model <-
-  fit(bike_split)
-tidy(final_model)
+final_rf_model <- rand_forest_final_wkf |>
+  fit(data = bike_daily)
+
+final_rf_model
+
+extract_fit_engine(final_rf_model)
 ```
 
