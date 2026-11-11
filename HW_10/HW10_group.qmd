@@ -358,8 +358,7 @@ reg_tree_final_model <- extract_workflow(reg_tree_final_fit)
 
 ```{r}
 ## Define Model
-bag_tree_mod <- bag_tree(tree_depth = tune(),
-                          min_n = 20,
+bag_tree_mod <- bag_tree(min_n = 20,
                           cost_complexity = tune())|>
   set_engine("rpart")|>
   set_mode("regression")
@@ -370,8 +369,7 @@ bag_tree_wkf <- workflow()|>
   add_model(bag_tree_mod)
 
 bag_tree_grid <- grid_regular(cost_complexity(),
-                          tree_depth(),
-                          levels = c(10, 5))
+                          levels = 15)
 
 ## Fit & tune tree
 bag_tree_fits <- bag_tree_wkf |> 
@@ -418,6 +416,7 @@ rand_forest_wkf <- workflow()|>
 rand_forest_fits <- rand_forest_wkf |> 
   tune_grid(resamples = bike_CV_folds,
             grid = 10)
+collect_metrics(rand_forest_fits)
 ```
 
 ```{r}
@@ -452,13 +451,34 @@ First, the best models from each family of models are used to predict test data 
 # Bagged tree model predictions
 # Random forest model predictions
 
-predict(rand_forest_final_model, new_data = testing$RentedBikeCount)
+rf_preds <- collect_predictions(rand_forest_final_fit)
+
+reg_preds <- collect_predictions(reg_tree_final_fit)
+
+bag_preds <- collect_predictions(bag_tree_final_fit)
+
+
 ```
 
 Now that we've use each model to predict on the test set values, here is a summary report for each model.
 ```{r}
 # MLR final model fit
+MLR_final_fit <- MLR_wkf3 |>
+  last_fit(bike_split)
 
+reg_tree_final_fit <- reg_tree_final_wkf |>
+  last_fit(bike_split)
+
+bag_tree_final_fit <- bag_tree_final_wkf |>
+  last_fit(bike_split)
+
+rand_forest_final_fit <- rand_forest_final_wkf |>
+  last_fit(bike_split)
+
+collect_metrics(MLR_final_fit)
+collect_metrics(reg_tree_final_fit)
+collect_metrics(bag_tree_final_fit)
+collect_metrics(rand_forest_final_fit)
 # regression tree final model fit
 reg_tree_final_model |>
   extract_fit_engine() |>
