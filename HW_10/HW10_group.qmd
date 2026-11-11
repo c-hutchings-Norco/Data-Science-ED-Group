@@ -6,11 +6,11 @@ format: html
 Reading in some tools!
 
 ```{r}
-#| warnings: hold
 library(tidyverse)
 library(tidymodels)
 library(rpart.plot)
 library(baguette)
+library(ranger)
 ```
 
 ### Reading Data and EDA
@@ -295,8 +295,9 @@ Fit the model to the entire training data set.
 
 ```{r}
 MLR_final_fit <- MLR_wkf3 |>
-  last_fit(bike_split) |>
-  collect_metrics()
+  last_fit(bike_split) 
+
+MLR_final_fit |> collect_metrics()
 
 ```
 
