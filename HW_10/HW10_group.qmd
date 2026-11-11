@@ -403,8 +403,8 @@ bag_tree_final_model <- extract_workflow(bag_tree_final_fit)
 
 ```{r}
 ## Define Model
-rand_forest_mod <- rand_forest(mtry = tune())|>
-  set_engine("ranger")|>
+rand_forest_mod <- rand_forest(mtry = tune()) |>
+  set_engine("ranger", importance = "impurity") |>
   set_mode("regression")
 
 ## Add model & recipe to workflow
@@ -490,6 +490,63 @@ bind_rows(
   collect_metrics(bag_tree_final_fit) |> mutate(Model = "Bagged Tree"),
   collect_metrics(rand_forest_final_fit) |> mutate(Model = "Random Forest")
 )
+
+#Final Coefficient table for MLR model
+mlr_model <- extract_workflow(MLR_final_fit)
+
+mlr_model |>
+  extract_fit_parsnip() |>
+  tidy()
+
+#Plot of final tree for regression tree model
+reg_tree_final_model |>
+  extract_fit_engine() |>
+  rpart.plot::rpart.plot(roundint = FALSE)
+
+#Bagged tree variable importance plot
+
+bag_model <- bag_tree_final_model |>
+  extract_fit_parsnip() |>
+  extract_fit_engine()
+
+bag_model$imp |>
+  arrange(desc(value)) |>
+  ggplot(aes(
+    x = reorder(term, value),
+    y = value
+  )) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Bagged Tree Variable Importance",
+    x = "Variable",
+    y = "Importance"
+  )
+
+#Random Forest variable importance plot
+rf_model <- rand_forest_final_model |>
+  extract_fit_parsnip() |>
+  extract_fit_engine()
+
+library(tidyverse)
+
+tibble(
+  term = names(rf_model$variable.importance),
+  value = rf_model$variable.importance
+) |>
+  arrange(desc(value)) |>
+  ggplot(aes(
+    x = reorder(term, value),
+    y = value
+  )) +
+  geom_col(fill = "forestgreen") +
+  coord_flip() +
+  labs(
+    title = "Random Forest Variable Importance",
+    x = "Variable",
+    y = "Importance"
+  ) +
+  theme_minimal()
 ```
 
 The best model is now fit with the overall data
